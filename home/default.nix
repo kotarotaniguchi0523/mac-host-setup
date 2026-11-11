@@ -48,17 +48,15 @@
     ctx7
   ];
 
-  # ~/.local/bin holds installs made outside these declarations (Claude Code's own installer,
-  # the T3 Code desktop app's `t3` shim). Kept on PATH until they are
-  # moved into the declarations (AUDIT.md "既知の野良"). tools/check.sh still reports them.
-  home.sessionPath = [ "$HOME/.local/bin" ];
-
   programs.zsh = {
     enable = true;
     # Docker Desktop (installed outside these declarations) used to append this to ~/.zprofile,
     # which home-manager now owns. Same position as before: appended.
+    # ~/.local/bin holds installs made outside these declarations (Claude Code's own installer).
+    # Appended (after the Nix profiles) so a declared tool always wins over a stray one;
+    # tools/check.sh still reports what is in there (AUDIT.md "既知の野良").
     profileExtra = ''
-      export PATH="$PATH:$HOME/.docker/bin"
+      export PATH="$PATH:$HOME/.docker/bin:$HOME/.local/bin"
     '';
   };
 

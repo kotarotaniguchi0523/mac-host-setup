@@ -62,6 +62,9 @@ mise="/etc/profiles/per-user/$USER/bin/mise"
 [[ -x "$mise" ]] || mise="$(command -v mise)" || die "mise not found after activation" 4
 # Run from $HOME so only the global config applies (not this repository's dev-tool config).
 (cd "$HOME" && "$mise" install --locked)
+# Remove versions no tracked config uses any more (e.g. a tool moved from mise to Nix), then
+# rebuild the shims so a removed tool cannot shadow its Nix replacement.
+(cd "$HOME" && "$mise" prune --yes && "$mise" reshim)
 echo "[ok] mise tools installed (locked)"
 
 # --- 4. verify --------------------------------------------------------------------------
