@@ -12,7 +12,7 @@
 # Writes .agent/update-report.json. Exit 0 = clean, 5 = needs attention.
 set -uo pipefail
 repo="$(cd "$(dirname "$0")/.." && pwd)"
-cd "$repo"
+cd "$repo" || exit 4
 notify=0; [[ "${1:-}" == "--notify" ]] && notify=1
 export PATH="/run/current-system/sw/bin:/etc/profiles/per-user/$USER/bin:$PATH"
 

@@ -29,5 +29,8 @@ description = "Nix と mise の検証レベルを比較する: mise run compare 
 run = "tools/compare-source.sh"
 
 [tasks.lint]
-description = "hk の全チェック（pre-push と同じ）"
-run = "hk run pre-push --all"
+description = "全ファイルに hk の pre-commit チェック + nix flake check（pre-push 相当）"
+run = [
+  "hk run pre-commit --all",
+  "nix flake check --impure --no-build",
+]

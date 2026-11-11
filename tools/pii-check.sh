@@ -10,7 +10,7 @@
 # In the repository, write placeholders instead: $HOME / ~ / %GITHUB_USER% / %EMAIL%.
 set -uo pipefail
 repo="$(cd "$(dirname "$0")/.." && pwd)"
-cd "$repo"
+cd "$repo" || exit 4
 
 patterns=("/Users/$USER" "$HOME")
 [[ -n "${USER:-}" ]] && patterns+=("$USER")
