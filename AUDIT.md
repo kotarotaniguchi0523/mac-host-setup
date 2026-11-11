@@ -60,7 +60,7 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | herdr | 使わない（ユーザー判断、2026-11-11）。参考: nixpkgs に無く、mise も `[none]`（E） |
 | agent-desktop | Windows のデスクトップ操作用（win32 バイナリ前提）。macOS で必要か要確認 |
 | ghtkn | Windows の git credential helper。macOS は gh の期限付きトークン（`gh auth setup-git`）を使う |
-| openclaw | nixpkgs が `knownVulnerabilities` で insecure 指定（「LLM で信頼できない内容を解釈しプロンプトインジェクションに脆弱、既定でシステム全体にアクセス」）。設計上の指摘で版では解消しないため、ユーザー判断待ち（許可する場合は `permittedInsecurePackages` に名前指定） |
+| openclaw | 使わない（ユーザー判断、2026-11-11）。参考: nixpkgs が insecure 指定（プロンプトインジェクション、既定でシステム全体にアクセス） |
 | apm / skillspector | Skills レーン（PLAN.md）で別途判定 |
 
 ## 既知の脆弱性（vulnix、2026-11-11）
