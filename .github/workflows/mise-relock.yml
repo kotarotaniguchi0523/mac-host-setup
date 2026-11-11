@@ -40,6 +40,8 @@ jobs:
           persist-credentials: true # zizmor: artipacked -- needed to push to the PR branch
       - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
         with:
+          # Same mise as the host (nixpkgs in flake.lock): lockfile fields differ between versions.
+          version: 2026.10.17
           install: false
           cache: true
       - name: regenerate lockfiles
