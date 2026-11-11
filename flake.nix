@@ -15,7 +15,14 @@
     };
   };
 
-  outputs = { self, nixpkgs, nix-darwin, home-manager, ... }:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      nix-darwin,
+      home-manager,
+      ...
+    }:
     let
       system = "aarch64-darwin";
       # The user name and repository path are read from the environment so that no
@@ -27,7 +34,14 @@
     {
       darwinConfigurations.default = nix-darwin.lib.darwinSystem {
         inherit system;
-        specialArgs = { inherit self user home repoDir; };
+        specialArgs = {
+          inherit
+            self
+            user
+            home
+            repoDir
+            ;
+        };
         modules = [
           ./hosts/darwin.nix
           home-manager.darwinModules.home-manager
@@ -42,6 +56,6 @@
         ];
       };
 
-      formatter.${system} = nixpkgs.legacyPackages.${system}.nixfmt-rfc-style;
+      formatter.${system} = nixpkgs.legacyPackages.${system}.nixfmt;
     };
 }

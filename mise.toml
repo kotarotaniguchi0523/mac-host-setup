@@ -7,8 +7,8 @@ shellcheck  = "0.11.0"  # tools/*.sh
 "github:jdx/jactionlint" = "v2.3.0"  # GitHub Actions lint (when workflows are added)
 pinact      = "5.0.2"   # `uses:` must be pinned to a commit SHA
 
+# paranoid is a global-only setting (mise ignores it in project configs)
 [settings]
-paranoid            = true
 locked              = true
 minimum_release_age = "2d"
 pin                 = true

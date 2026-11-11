@@ -55,9 +55,13 @@ mise_dst="$HOME/.config/mise"
 mkdir -p "$mise_dst"
 cp "$repo/mise/mise.toml" "$mise_dst/config.toml"
 [[ -f "$repo/mise/mise.lock" ]] && cp "$repo/mise/mise.lock" "$mise_dst/mise.lock"
+# The running shell predates the activation: put the new profiles first so mise finds the
+# Nix-provided runtimes (node / pnpm for npm: tools, python / uv for pypi: tools).
+export PATH="/etc/profiles/per-user/$USER/bin:/run/current-system/sw/bin:$PATH"
 mise="/etc/profiles/per-user/$USER/bin/mise"
 [[ -x "$mise" ]] || mise="$(command -v mise)" || die "mise not found after activation" 4
-"$mise" install --locked
+# Run from $HOME so only the global config applies (not this repository's dev-tool config).
+(cd "$HOME" && "$mise" install --locked)
 echo "[ok] mise tools installed (locked)"
 
 # --- 4. verify --------------------------------------------------------------------------

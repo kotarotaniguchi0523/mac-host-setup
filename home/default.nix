@@ -1,4 +1,9 @@
-{ pkgs, user, home, ... }:
+{
+  pkgs,
+  user,
+  home,
+  ...
+}:
 {
   imports = [ ./launchd.nix ];
 
@@ -9,8 +14,7 @@
   # Global CLIs from Nix (nixpkgs pinned by flake.lock). Every entry has a decision in AUDIT.md
   # (tools/compare-source.sh). Tools that win on the mise side are in mise/mise.toml.
   home.packages = with pkgs; [
-    # --- base / package managers
-    mise
+    # --- base (mise itself comes from programs.mise below)
     gh
     # --- runtimes (only the default line is global; older lines are per project via mise)
     nodejs_26
@@ -42,5 +46,24 @@
     ctx7
   ];
 
-  programs.zsh.enable = true;
+  # ~/.local/bin holds installs made outside these declarations (Claude Code's own installer,
+  # the T3 Code desktop app's `t3` shim). Kept on PATH until they are
+  # moved into the declarations (AUDIT.md "既知の野良"). tools/check.sh still reports them.
+  home.sessionPath = [ "$HOME/.local/bin" ];
+
+  programs.zsh = {
+    enable = true;
+    # Docker Desktop (installed outside these declarations) used to append this to ~/.zprofile,
+    # which home-manager now owns. Same position as before: appended.
+    profileExtra = ''
+      export PATH="$PATH:$HOME/.docker/bin"
+    '';
+  };
+
+  # Puts the global mise tools (mise/mise.toml) on PATH in zsh, ahead of ~/.local/bin.
+  # The config file itself is copied by tools/update.sh (not managed here: mise writes its lock).
+  programs.mise = {
+    enable = true;
+    enableZshIntegration = true;
+  };
 }

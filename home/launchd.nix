@@ -1,4 +1,9 @@
-{ pkgs, home, repoDir, ... }:
+{
+  pkgs,
+  home,
+  repoDir,
+  ...
+}:
 {
   # Read-only daily check (replaces the Windows Task Scheduler job).
   # It never applies anything and never uses sudo: it fetches origin, compares the host
@@ -7,8 +12,17 @@
   launchd.agents.mac-host-setup-check = {
     enable = true;
     config = {
-      ProgramArguments = [ "/bin/zsh" "-lc" "${repoDir}/tools/check.sh --notify" ];
-      StartCalendarInterval = [ { Hour = 8; Minute = 30; } ];
+      ProgramArguments = [
+        "/bin/zsh"
+        "-lc"
+        "${repoDir}/tools/check.sh --notify"
+      ];
+      StartCalendarInterval = [
+        {
+          Hour = 8;
+          Minute = 30;
+        }
+      ];
       RunAtLoad = false;
       StandardOutPath = "${home}/Library/Logs/mac-host-setup-check.log";
       StandardErrorPath = "${home}/Library/Logs/mac-host-setup-check.log";

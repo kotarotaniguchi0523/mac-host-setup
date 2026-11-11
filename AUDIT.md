@@ -78,3 +78,13 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | ShellCheck 0.11.0 | CVE-2021-28794（VS Code 拡張） | 誤検知 |
 
 生データは `.agent/vulnix.json`（ローカルのみ）。CI 再構築時に定期実行し、誤検知は vulnix の whitelist に根拠付きで登録する（PLAN.md）。
+
+## 既知の野良（宣言の外にある導入物）
+
+このセッション以前から入っていたもの。`tools/check.sh` が毎回報告する。PATH は `home/default.nix` で維持している。
+
+| もの | 場所 | 入れ方 | 方針（ユーザー判断待ち） |
+|---|---|---|---|
+| Claude Code | `~/.local/bin/claude` → `~/.local/share/claude/versions/*` | 公式インストーラー（自己更新） | nixpkgs `claude-code` へ移すか、自己更新を例外として認めるか |
+| T3 Code の `t3` シム | `~/.local/bin/t3` → `~/.t3/bin/t3` | T3 Code デスクトップアプリが配置 | CLI は mise `npm:t3` が先に解決される。デスクトップアプリ自体の入手元（GUI アプリの規則）を判定する |
+| Docker Desktop | `~/.docker/bin`（`/Applications/Docker.app`） | 公式 dmg（推定） | GUI アプリの規則（公式 dmg の署名・公証確認）で記録する |
