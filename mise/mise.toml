@@ -4,6 +4,13 @@
 # Only tools whose decision in AUDIT.md is "mise" belong here (AGENTS.md: Nix first, mise when its
 # verification level is clearly higher, or when nixpkgs cannot provide it). Exact pins only.
 [tools]
+"aqua:k1LoW/mo"               = "1.7.0"
+"github:microsoft/waza"       = "v0.39.0"
+"aqua:microsoft/tgrep"        = "1.2.4"
+"github:init-co-jp/diff-tour" = "v0.6.0"
+# T3 Code CLI (`t3`). nixpkgs only has the desktop app (t3code-desktop).
+"npm:t3"                      = "0.1.2"
+"npm:secretlint"              = "13.0.7"
 
 [settings]
 paranoid                 = true

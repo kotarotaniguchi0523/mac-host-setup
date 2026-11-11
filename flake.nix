@@ -4,13 +4,13 @@
   # All inputs are pinned exactly by flake.lock (rev + narHash). Do not run
   # `nix flake update` on the host: flake.lock changes arrive only via PR.
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-26.05-darwin";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin = {
-      url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
+      url = "github:nix-darwin/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      url = "github:nix-community/home-manager/release-26.05";
+      url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -34,6 +34,8 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
+            # Existing dotfiles (e.g. ~/.zshrc) are kept as *.before-home-manager instead of failing.
+            home-manager.backupFileExtension = "before-home-manager";
             home-manager.extraSpecialArgs = { inherit user home repoDir; };
             home-manager.users.${user} = import ./home;
           }
