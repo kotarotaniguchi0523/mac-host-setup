@@ -40,6 +40,7 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | pi | 1.5.0 (`pi-coding-agent`) | B | checksum（C） | **Nix** | 上流は同じ earendil-works/pi |
 | agent-browser | 0.41.1 | B（fromSource） | npm | **Nix** | |
 | ctx7 | 0.8.2 | B | npm | **Nix** | |
+| T3 Code（デスクトップ + `t3` CLI） | 0.1.6 (`t3code`) | B（ソース + pnpm 依存をハッシュ固定、nixpkgs の Electron） | 公式 DMG 0.1.8: Developer ID + 公証だが自己更新（版を固定できない） | **Nix**（ユーザー判断、2026-11-11） | GUI アプリの規則（App Store に無し → nixpkgs）。CLI も同梱のため mise の `npm:t3` は廃止 |
 
 ## mise で入れるもの（`mise/mise.toml`）
 
@@ -49,7 +50,6 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | `github:microsoft/waza` | nixpkgs に無い | checksum（C） |
 | `aqua:microsoft/tgrep` | nixpkgs に無い | checksum（C） |
 | `github:init-co-jp/diff-tour` | nixpkgs に無い | checksum（C） |
-| `npm:t3` | nixpkgs はデスクトップ版（`t3code-desktop`）のみ。CLI は npm | npm（Takumi Guard 経由） |
 | `npm:secretlint` | nixpkgs に無い | npm（Takumi Guard 経由） |
 | `github:yusukebe/ax` | nixpkgs に無い。`ubi:` は検証なし（E）、`github:` は公開 `checksums.txt` で検証（C）。ユーザー承認（2026-11-11） | checksum（C） |
 
@@ -86,5 +86,5 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | もの | 場所 | 入れ方 | 方針（ユーザー判断待ち） |
 |---|---|---|---|
 | Claude Code | `~/.local/bin/claude` → `~/.local/share/claude/versions/*` | 公式インストーラー（自己更新） | nixpkgs `claude-code` へ移すか、自己更新を例外として認めるか |
-| T3 Code の `t3` シム | `~/.local/bin/t3` → `~/.t3/bin/t3` | T3 Code デスクトップアプリが配置 | CLI は mise `npm:t3` が先に解決される。デスクトップアプリ自体の入手元（GUI アプリの規則）を判定する |
+| T3 Code (Beta)（公式 DMG）と `t3` シム | `/Applications/T3 Code (Beta).app`、`~/.local/bin/t3` | 公式 DMG | Nix 版へ移行後に削除（ユーザー確認のうえ） |
 | Docker Desktop | `~/.docker/bin`（`/Applications/Docker.app`） | 公式 dmg（推定） | GUI アプリの規則（公式 dmg の署名・公証確認）で記録する |

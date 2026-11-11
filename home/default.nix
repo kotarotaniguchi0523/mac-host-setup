@@ -43,6 +43,8 @@
     opencode
     pi-coding-agent
     agent-browser
+    # --- GUI apps (AGENTS.md: App Store -> nixpkgs -> vendor dmg)
+    t3code # T3 Code desktop + `t3` CLI, built from source
     ctx7
   ];
 

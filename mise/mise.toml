@@ -10,8 +10,6 @@
 "github:init-co-jp/diff-tour" = "v0.6.0"
 # ax: not in nixpkgs. github backend verifies the published checksums.txt (ubi: had none).
 "github:yusukebe/ax"          = "v0.1.25"
-# T3 Code CLI (`t3`). nixpkgs only has the desktop app (t3code-desktop).
-"npm:t3"                      = "0.1.2"
 "npm:secretlint"              = "13.0.7"
 
 [settings]
