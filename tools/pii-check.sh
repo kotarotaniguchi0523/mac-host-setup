@@ -13,6 +13,8 @@ repo="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$repo" || exit 4
 
 patterns=("/Users/$USER" "$HOME")
+# Any macOS home path (catches other people's / CI-unknown user names too)
+generic_re='/Users/[A-Za-z0-9._-]+/' 
 [[ -n "${USER:-}" ]] && patterns+=("$USER")
 global_email="$(git config --global user.email 2>/dev/null || true)"
 [[ -n "$global_email" ]] && patterns+=("$global_email")
@@ -35,13 +37,21 @@ for p in "${patterns[@]}"; do
   fi
 done
 
+hits="$(grep -nHIE -- "$generic_re" "${files[@]}" 2>/dev/null | grep -v '^tools/pii-check.sh:' | grep -vE '/Users/(Shared|runner)/' || true)"
+if [[ -n "$hits" ]]; then
+  echo "[pii] found a macOS home path in:" >&2
+  echo "$hits" | cut -d: -f1,2 | sed 's/^/  /' >&2
+  status=1
+fi
+
 repo_email="$(git config user.email || true)"
-if [[ "$repo_email" != *@users.noreply.github.com ]]; then
+# CI has no local identity: only the history check below applies there.
+if [[ -z "${CI:-}" && "$repo_email" != *@users.noreply.github.com ]]; then
   echo "[pii] commits here must use the GitHub noreply address:" >&2
   echo "  git config user.email '<id>+<login>@users.noreply.github.com'" >&2
   status=1
 fi
-bad_authors="$(git log --format='%ae%n%ce' 2>/dev/null | sort -u | grep -v '@users.noreply.github.com$' | grep -v '^noreply@anthropic.com$' || true)"
+bad_authors="$(git log --format='%ae%n%ce' 2>/dev/null | sort -u | grep -v '@users.noreply.github.com$' | grep -vxE 'noreply@(anthropic|github)\.com' || true)"
 if [[ -n "$bad_authors" ]]; then
   echo "[pii] history has non-noreply author/committer emails (rewrite before pushing)" >&2
   status=1

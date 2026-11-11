@@ -1,0 +1,56 @@
+# Renovate (Mend hosted) cannot run `mise lock`, so its PRs that bump mise tools arrive without
+# lockfile updates. This regenerates the lockfiles on the PR branch, then dispatches ci.yml there
+# (pushes made with GITHUB_TOKEN do not trigger workflows by themselves).
+name: mise-relock
+
+on:
+  pull_request:
+    paths:
+      - mise/mise.toml
+      - mise.toml
+
+permissions: {}
+
+concurrency:
+  group: mise-relock-${{ github.head_ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  relock:
+    name: relock
+    # Only branches of this repository (Renovate). Fork PRs never get a write token.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: write # push the regenerated lockfiles to the PR branch
+      actions: write # dispatch ci.yml on the PR branch
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+      HEAD_REF: ${{ github.head_ref }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: true # zizmor: artipacked -- needed to push to the PR branch
+      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+        with:
+          install: false
+          cache: true
+      - name: regenerate lockfiles
+        run: tools/ci/mise-lock.sh --write
+      - name: push if changed
+        run: |
+          if git diff --quiet -- mise/mise.lock mise.lock; then
+            echo "[i] lockfiles already up to date"; exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(deps): relock mise" -- mise/mise.lock mise.lock
+          git push origin "HEAD:$HEAD_REF"
+          gh workflow run ci.yml --ref "$HEAD_REF"

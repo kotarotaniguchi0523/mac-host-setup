@@ -51,13 +51,13 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | `github:init-co-jp/diff-tour` | nixpkgs に無い | checksum（C） |
 | `npm:t3` | nixpkgs はデスクトップ版（`t3code-desktop`）のみ。CLI は npm | npm（Takumi Guard 経由） |
 | `npm:secretlint` | nixpkgs に無い | npm（Takumi Guard 経由） |
+| `github:yusukebe/ax` | nixpkgs に無い。`ubi:` は検証なし（E）、`github:` は公開 `checksums.txt` で検証（C）。ユーザー承認（2026-11-11） | checksum（C） |
 
 ## 入れないもの（報告）
 
 | ツール | 理由 |
 |---|---|
-| herdr | nixpkgs に無く、mise も `[none]`（E）。AGENTS.md の規則 5 により推測で入れない（Windows 版でも既知の逸脱） |
-| ax（`ubi:yusukebe/ax`） | nixpkgs に無く、mise も `[none]`（E）。同上 |
+| herdr | 使わない（ユーザー判断、2026-11-11）。参考: nixpkgs に無く、mise も `[none]`（E） |
 | agent-desktop | Windows のデスクトップ操作用（win32 バイナリ前提）。macOS で必要か要確認 |
 | ghtkn | Windows の git credential helper。macOS は gh の期限付きトークン（`gh auth setup-git`）を使う |
 | openclaw | nixpkgs が `knownVulnerabilities` で insecure 指定（「LLM で信頼できない内容を解釈しプロンプトインジェクションに脆弱、既定でシステム全体にアクセス」）。設計上の指摘で版では解消しないため、ユーザー判断待ち（許可する場合は `permittedInsecurePackages` に名前指定） |

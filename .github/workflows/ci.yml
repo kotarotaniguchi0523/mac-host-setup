@@ -1,0 +1,76 @@
+# CI for mac-host-setup. Every check is a script under tools/ (reproducible locally).
+#  - lint     : hk pre-commit steps on all files (betterleaks / shellcheck / pii / jactionlint / pinact)
+#  - mise-lock: mise lockfiles are complete and up to date (global lane + dev tools)
+#  - nix      : install Nix with tools/install-nix.sh, nixfmt, flake check, build the full system
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # pii-check inspects commit author emails
+      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+        with:
+          install: true
+          cache: true
+      - name: hk (all files)
+        env:
+          HK_SKIP_STEPS: nixfmt,flake-check # need Nix; run in the nix job
+        run: hk run pre-commit --all
+
+  mise-lock:
+    name: mise-lock
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+        with:
+          install: false
+          cache: true
+      - name: lockfiles are up to date
+        env:
+          GITHUB_TOKEN: ${{ github.token }} # GitHub API rate limit for release lookups
+        run: tools/ci/mise-lock.sh --check
+
+  nix:
+    name: nix
+    runs-on: macos-26
+    permissions:
+      contents: read
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: install Nix (pinned + verified, same script as the host)
+        run: tools/install-nix.sh
+      - name: nixfmt / flake check / build
+        run: tools/ci/nix-check.sh

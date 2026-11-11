@@ -35,3 +35,13 @@ mise trust . && mise install --locked && hk install   # このリポジトリ用
 | 適用（手動） | `tools/update.sh` — **`origin/main` で更新された内容だけ**を適用（ローカル変更・未 push があると中止） |
 | 入手元の判定 | `tools/compare-source.sh <nixpkgs-attr> [<mise-tool>]` → `AUDIT.md` に記録 |
 | リポジトリのチェック | `hk` の pre-commit / pre-push（`mise run lint` で全件） |
+
+## CI（`.github/workflows/`）
+
+中身はすべて `tools/` のスクリプトで、ローカルでも同じコマンドで再現できる。
+
+| ワークフロー | 内容 |
+|---|---|
+| `ci.yml` | push / PR で **lint**（hk: betterleaks / shellcheck / pii / jactionlint / pinact）・**mise-lock**（`tools/ci/mise-lock.sh --check`）・**nix**（macOS ランナーで `tools/install-nix.sh` → `tools/ci/nix-check.sh`: nixfmt / flake check / システム全体のビルド） |
+| `flake-lock.yml` | 週次。各 input を **2 日以上前の最新 commit** へ（`tools/ci/flake-lock-update.sh`）。ビルドしてから PR を作り、ci を起動 |
+| `mise-relock.yml` | Renovate の PR で mise の lock を再生成して push し、ci を起動（Mend の Renovate は `mise lock` を実行できない） |

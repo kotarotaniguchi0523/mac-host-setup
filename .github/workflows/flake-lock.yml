@@ -1,0 +1,60 @@
+# Weekly flake.lock update: each input moves to its newest commit that is at least 2 days old
+# (tools/ci/flake-lock-update.sh). The system is built in this job before the PR is opened, and
+# ci.yml is dispatched on the PR branch (pushes made with GITHUB_TOKEN do not trigger workflows).
+name: flake-lock
+
+on:
+  schedule:
+    - cron: "0 21 * * 0" # Mon 06:00 JST
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: flake-lock
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  update:
+    name: update flake.lock
+    runs-on: macos-26
+    permissions:
+      contents: write # push the update branch
+      pull-requests: write # open / update the PR
+      actions: write # dispatch ci.yml on the PR branch
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BRANCH: flake-lock/update
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: true # zizmor: artipacked -- needed to push the update branch
+      - name: install Nix
+        run: tools/install-nix.sh
+      - name: update flake.lock (inputs >= 2 days old)
+        id: lock
+        run: |
+          . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+          tools/ci/flake-lock-update.sh
+      - name: build the updated system
+        if: steps.lock.outputs.changed == 'true'
+        run: tools/ci/nix-check.sh
+      - name: open / update the PR
+        if: steps.lock.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -C "$BRANCH"
+          git commit -m "chore(deps): update flake.lock (inputs >= 2 days old)" -- flake.lock
+          git push --force origin "$BRANCH"
+          if [[ -z "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')" ]]; then
+            gh pr create --head "$BRANCH" --base main \
+              --title "chore(deps): update flake.lock" \
+              --body "Inputs moved to their newest commits that are at least 2 days old (tools/ci/flake-lock-update.sh). The system was built in this workflow run before opening the PR."
+          fi
+          gh workflow run ci.yml --ref "$BRANCH"

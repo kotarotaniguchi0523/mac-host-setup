@@ -62,6 +62,21 @@ checksum = "sha256:f4732e350a61e22f440ddfe7fcedc2e781661fd7c039cf3005af90bab5d52
 url = "https://github.com/microsoft/waza/releases/download/v0.39.0/waza-darwin-arm64"
 url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/660184384"
 
+[[tools."github:yusukebe/ax"]]
+version = "0.1.25"
+backend = "github:yusukebe/ax"
+specifiers = ["v0.1.25"]
+
+[tools."github:yusukebe/ax"."platforms.linux-x64"]
+checksum = "sha256:6e72297182074038a202d94e1cca9d61e8908d8a4fd5206b3c25ab91957cae2f"
+url = "https://github.com/yusukebe/ax/releases/download/v0.1.25/ax-linux-x64"
+url_api = "https://api.github.com/repos/yusukebe/ax/releases/assets/502198735"
+
+[tools."github:yusukebe/ax"."platforms.macos-arm64"]
+checksum = "sha256:94633f9d61c743cffcf51e5338289d974c21428efb70bd2995e6c6ec13e062c1"
+url = "https://github.com/yusukebe/ax/releases/download/v0.1.25/ax-darwin-arm64"
+url_api = "https://api.github.com/repos/yusukebe/ax/releases/assets/502198739"
+
 [[tools."npm:secretlint"]]
 version = "13.0.7"
 backend = "npm:secretlint"
