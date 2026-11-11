@@ -1,0 +1,5 @@
+# Local-only data (never committed): raw host data, reports, backups, personal notes
+.agent/
+# nix build outputs
+result
+result-*

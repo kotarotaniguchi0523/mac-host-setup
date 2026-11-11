@@ -1,0 +1,53 @@
+amends "package://github.com/jdx/hk/releases/download/v2.6.0/hk@2.6.0#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v2.6.0/hk@2.6.0#/Builtins.pkl"
+
+// Lint for this repository (macOS host)
+//  - betterleaks : secrets
+//  - shellcheck  : tools/*.sh
+//  - pii         : no real home paths / user name committed (use $HOME / ~)
+//  - nix         : flake evaluates and is formatted (pre-push only; needs Nix)
+//  - jactionlint / pinact : GitHub Actions (only when workflows exist)
+
+local all = new Mapping<String, Step> {
+    ["betterleaks"] = Builtins.betterleaks
+    ["shellcheck"] = new Step {
+        glob = List("tools/*.sh")
+        check = "shellcheck --severity=warning {{files}}"
+    }
+    ["pii"] = new Step {
+        glob = List("**/*")
+        check = "tools/pii-check.sh {{files}}"
+    }
+    ["nixfmt"] = new Step {
+        glob = List("**/*.nix")
+        check = "nix fmt -- --check {{files}}"
+        fix = "nix fmt -- {{files}}"
+    }
+    ["flake-check"] = new Step {
+        glob = List("**/*.nix", "flake.lock")
+        check = "nix flake check --impure --no-build"
+    }
+    ["jactionlint"] = Builtins.jactionlint
+    ["pinact"] = new Step {
+        glob = List(".github/workflows/*.yml")
+        check = "pinact run --fix=false --no-api"
+        fix = "pinact run"
+    }
+}
+
+// pre-commit: fast checks; secrets never enter local history
+hooks {
+    ["pre-commit"] {
+        steps = new Mapping<String, Step | Group> {
+            ["betterleaks"] = all["betterleaks"]
+            ["shellcheck"] = all["shellcheck"]
+            ["pii"] = all["pii"]
+            ["nixfmt"] = all["nixfmt"]
+            ["jactionlint"] = all["jactionlint"]
+            ["pinact"] = all["pinact"]
+        }
+    }
+    ["pre-push"] {
+        steps = all
+    }
+}

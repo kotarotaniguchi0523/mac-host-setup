@@ -1,0 +1,115 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":enableVulnerabilityAlertsWithLabel(security)"
+  ],
+  "timezone": "Asia/Tokyo",
+  "schedule": [
+    "before 6am every weekday"
+  ],
+  "minimumReleaseAge": "2 days",
+  "labels": [
+    "dependencies"
+  ],
+  "rangeStrategy": "pin",
+  "pinDigests": true,
+  "separateMajorMinor": false,
+  "separateMinorPatch": false,
+  "separateMultipleMajor": false,
+  "rebaseWhen": "auto",
+  "prConcurrentLimit": 3,
+  "prHourlyLimit": 0,
+  "branchConcurrentLimit": 0,
+  "packageRules": [
+    {
+      "description": "グループ1: mise のツール一式を 1 PR にまとめる",
+      "matchManagers": [
+        "mise"
+      ],
+      "groupName": "mise tools",
+      "groupSlug": "mise-tools"
+    },
+    {
+      "description": "グループ2: GitHub Actions 一式を 1 PR にまとめる（コミット SHA 固定）",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "groupName": "GitHub Actions",
+      "groupSlug": "github-actions",
+      "pinDigests": true
+    },
+    {
+      "description": "グループ3: Skills（APM）を 1 PR にまとめる（apm.yml の owner/repo#ref を更新）",
+      "matchManagers": [
+        "apm"
+      ],
+      "groupName": "Skills (APM)",
+      "groupSlug": "skills-apm"
+    },
+    {
+      "description": "flake.lock は Renovate ではなく専用 workflow（2日以上前の commit にだけ更新）で更新する（PLAN.md）",
+      "matchManagers": [
+        "nix"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "mise / APM の lock は relock ワークフローが再生成する。Mend hosted の Renovate は mise lock / apm install を実行できない（unsafe execution / CLI 無し）ため、artifact 更新は試行しない",
+      "matchManagers": [
+        "mise",
+        "apm"
+      ],
+      "skipArtifactsUpdate": true,
+      "lockFileMaintenance": {
+        "enabled": false
+      }
+    },
+    {
+      "description": "Major updates get separate PRs and merge after required CI succeeds",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "groupName": null,
+      "dependencyDashboardApproval": false
+    },
+    {
+      "description": "Minor and patch updates merge after required CI succeeds",
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "automerge": false
+    }
+  ],
+  "mise": {
+    "updatePinnedDependencies": true
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": [
+      "before 6am on the first day of the month"
+    ]
+  },
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": [
+      "security"
+    ],
+    "description": "脆弱性アラート由来の更新は、スケジュール・リリース経過日数・Dashboard 承認を迂回して即座に PR を作る（CI 再構築までは automerge しない）",
+    "schedule": [
+      "at any time"
+    ],
+    "minimumReleaseAge": null,
+    "dependencyDashboardApproval": false,
+    "groupName": null,
+    "automerge": false
+  },
+  "osvVulnerabilityAlerts": true,
+  "ignorePaths": [],
+  "automerge": false,
+  "automergeStrategy": "squash",
+  "dependencyDashboardApproval": false
+}

@@ -1,0 +1,25 @@
+# Global mise config for the macOS host. tools/update.sh copies this to ~/.config/mise/config.toml.
+# (Kept under the name mise.toml so mise does not treat it as a project config inside the repo.)
+#
+# Only tools whose decision in AUDIT.md is "mise" belong here (AGENTS.md: Nix first, mise when its
+# verification level is clearly higher, or when nixpkgs cannot provide it). Exact pins only.
+[tools]
+
+[settings]
+paranoid                 = true
+locked                   = true
+locked_verify_provenance = true
+minimum_release_age      = "2d"
+pin                      = true
+
+[settings.npm]
+package_manager = "pnpm"
+
+[settings.pypi]
+registry_url = "https://pypi.flatt.tech/simple/{}/"
+
+[env]
+PIP_REQUIRE_VIRTUALENV = "true"
+PIP_INDEX_URL          = "https://pypi.flatt.tech/simple/"
+UV_INDEX_URL           = "https://pypi.flatt.tech/simple/"
+NPM_CONFIG_REGISTRY    = "https://npm.flatt.tech/"

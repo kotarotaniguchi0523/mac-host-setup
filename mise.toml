@@ -1,0 +1,33 @@
+# Dev tools scoped to this repository (separate from the global config mise/mise.toml).
+# Setup: mise trust . && mise install --locked && hk install
+[tools]
+hk          = "2.8.1"   # git hooks (hk.pkl)
+betterleaks = "1.9.0"   # secret scan (self-contained binary)
+shellcheck  = "0.11.0"  # tools/*.sh
+"github:jdx/jactionlint" = "v2.3.0"  # GitHub Actions lint (when workflows are added)
+pinact      = "5.0.2"   # `uses:` must be pinned to a commit SHA
+
+[settings]
+paranoid            = true
+locked              = true
+minimum_release_age = "2d"
+pin                 = true
+
+# --- Host entry points (see README.md) ---------------------------------------
+[tasks.check]
+description = "読み取りのみ: リモートとの差分・ドリフト・野良を確認する"
+alias = "c"
+run = "tools/check.sh"
+
+[tasks.update]
+description = "origin/main の内容だけをホストへ適用して検証する"
+alias = "u"
+run = "tools/update.sh"
+
+[tasks.compare]
+description = "Nix と mise の検証レベルを比較する: mise run compare -- <nixpkgs-attr> [<mise-tool>]"
+run = "tools/compare-source.sh"
+
+[tasks.lint]
+description = "hk の全チェック（pre-push と同じ）"
+run = "hk run pre-push --all"

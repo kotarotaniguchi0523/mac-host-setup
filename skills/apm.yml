@@ -1,0 +1,31 @@
+name: win-host-setup
+version: 1.0.0
+description: Global Skills / APM packages used on this host (verification-focused, version-pinned)
+
+# Deploy targets, declared explicitly so the resolution does not depend on per-machine
+# auto-detection (see docs: targets matrix):
+#   codex    -> ~/.agents/skills/<name>/
+#   opencode -> ~/.config/opencode/skills/<name>/
+targets:
+  - codex
+  - opencode
+
+dependencies:
+  apm:
+    # Browser automation / web fetching
+    - vercel-labs/agent-browser#d52a5e90c372ec4710c69adc3837ac14bbd852aa # v0.41.2
+    - yusukebe/ax#0ddd8a748ae2401ae344f536f6e8dded890fcdbf # v0.1.25
+    # Japanese proofreading (rewrite AI-generated Japanese into natural Japanese)
+    - nanaism/yomiyasu#29d67ccb05e370b5958d72920a9cd1aa829dee80 # v2.5.0
+    # Official Nushell skills (nushell org / nu_scripts)
+    # No tags upstream, so this stays on a branch: APM updates it (`apm update`, or the
+    # scheduled relock that re-resolves `main`). Renovate does not touch branch refs.
+    - nushell/nu_scripts#1e6533e8c316386f9576d7220a72ab05ce48c52a # main
+    # Explanation / diagram skills (by mizchi). No tags upstream: same APM-managed branch ref.
+    - mizchi/explainer#ccdd7bacfb47451e38506d837af8a629504960b2 # main
+    # Official Waza skills (Skill evaluation CLI operation / interaction)
+    - microsoft/waza/skills/waza#e0c251df896bee4e0f9b38a693a6105bf7eadd19 # v0.40.1
+    - microsoft/waza/skills/waza-interactive#e0c251df896bee4e0f9b38a693a6105bf7eadd19 # v0.40.1
+
+devDependencies:
+  apm: []
