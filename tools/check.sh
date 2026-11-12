@@ -84,6 +84,12 @@ while IFS=$'\t' read -r name team path; do
   if [[ ! -d "$path" ]]; then add "exception: $name not found at $path"
   elif ! signed_by "$path" "$team"; then add "exception: $name ($path) is not signed with a Developer ID of team $team"; fi
 done < <(grep -v '^#' "$repo/exceptions.tsv")
+# sbx: Nix installs Docker's prebuilt, signed bundle without running it in the build (home/default.nix),
+# so its signature is checked here instead.
+if sbx="$(command -v sbx)"; then
+  sbx_app="$(realpath "$sbx")"; sbx_app="${sbx_app%/Contents/MacOS/sbx}"
+  signed_by "$sbx_app" 9BNSXJN65R || add "sbx: $sbx_app is not signed with Docker's Developer ID (team 9BNSXJN65R)"
+fi
 if command -v npm >/dev/null 2>&1; then
   npm_g="$(npm ls -g --depth=0 --parseable 2>/dev/null | tail -n +2 | xargs -n1 basename 2>/dev/null | grep -vE '^(npm|corepack)$' | paste -sd' ' -)"
   [[ -n "$npm_g" ]] && add "stray: npm -g has $npm_g"

@@ -36,15 +36,21 @@
     nushell
     betterleaks
     rtk
+    # --- Docker Sandboxes (sbx-setup builds and loads its templates from the host; the sandbox
+    #     tools themselves live in the templates). Docker Desktop is an exception (exceptions.tsv).
+    # The install check (`sbx version` run inside the build) makes macOS lock Sbx.app, and the store
+    # write then fails ("clearing flags of path ...: Operation not permitted"). Skipped here;
+    # tools/check.sh verifies the bundle's Docker signature instead.
+    (docker-sbx.overrideAttrs { doInstallCheck = false; })
+    lefthook
     # --- AI agents
     pi-coding-agent
     agent-browser
-    ctx7
   ];
 
   programs.zsh = {
     enable = true;
-    # Docker Desktop (installed outside these declarations) used to append this to ~/.zprofile,
+    # Docker Desktop (exception: exceptions.tsv / AUDIT.md) used to append this to ~/.zprofile,
     # which home-manager now owns. Same position as before: appended.
     # ~/.local/bin holds installs made outside these declarations (Claude Code's own installer).
     # Appended (after the Nix profiles) so a declared tool always wins over a stray one;

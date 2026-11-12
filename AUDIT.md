@@ -33,7 +33,8 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | rtk | 1.1.0 | B | checksum（C） | **Nix** | |
 | pi | 1.5.0 (`pi-coding-agent`) | B | checksum（C） | **Nix** | 上流は同じ earendil-works/pi |
 | agent-browser | 0.41.1 | B（fromSource） | npm | **Nix** | |
-| ctx7 | 0.8.2 | B | npm | **Nix** | |
+| lefthook | 2.2.2 | B | checksum, github_attestations（A） | **Nix**（A vs B） | sbx-setup の Git hooks（ホストで動く）。上流の最新と同じ版（2026-11-12） |
+| sbx（`docker-sbx`） | 0.50.1 | C（Docker 公式の署名済み tarball を固定 hash で取得、unfree） | 登録なし | **Nix** | Docker Sandboxes の CLI（sbx-setup がホストで使う）。公式の推奨は Homebrew（禁止）。上流 0.53.0、新しい版の公開から 9 日（2026-11-12）。ビルド中の版確認だけ外している（`home/default.nix`）。check.sh が Sbx.app の Docker 署名（Team `9BNSXJN65R`）を確認 |
 
 ## mise で入れるもの（`mise/mise.toml`）
 
@@ -59,6 +60,7 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | doppler / dotenvx / codex / opencode | 使わない（ユーザー判断、2026-11-12）。doppler / dotenvx は秘密情報を 1Password で扱うため |
 | ghtkn | Windows の git credential helper。macOS は gh の期限付きトークン（`gh auth setup-git`）を使う |
 | openclaw | 使わない（ユーザー判断、2026-11-11）。参考: nixpkgs が insecure 指定（プロンプトインジェクション、既定でシステム全体にアクセス） |
+| ctx7 | 使わない（ユーザー判断、2026-11-12） |
 | apm / skillspector | Skills レーン（PLAN.md）で別途判定 |
 
 ## 既知の脆弱性（vulnix、2026-11-11）
@@ -81,9 +83,7 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 
 このセッション以前から入っていたもの。`tools/check.sh` が毎回報告する。PATH は `home/default.nix` で維持している。
 
-| もの | 場所 | 入れ方 | 方針（ユーザー判断待ち） |
-|---|---|---|---|
-| Docker Desktop | `~/.docker/bin`（`/Applications/Docker.app`） | 公式 dmg（推定） | GUI アプリの規則（公式 dmg の署名・公証確認）で記録する |
+なし（2026-11-12。Docker Desktop は例外へ移した）。
 
 ## 例外（自己更新を認めるもの）
 
@@ -94,6 +94,7 @@ AGENTS.md の「ホスト側で版を決めない」の例外。**公式が推�
 |---|---|---|---|
 | T3 Code（デスクトップ） | `/Applications/T3 Code (Beta).app`（公式 DMG、自己更新） | アプリ本体の `codesign --verify --deep --strict -R`（Apple 発行の Developer ID、Team `ARK85ZXQ4Z` = T3 Tools, Inc.）、公証済み | 例外として承認（2026-11-12）。nixpkgs 版は 0.1.6 で 1,169 commit 遅れ、機能差が大きい。CLI は mise `npm:t3` |
 | Kanary（CLI） | `~/.local/bin/kanary` → `/Applications/Kanary.app/Contents/Helpers/kanary`（公式アプリ同梱、アプリと一緒に自己更新） | 置き場所、`codesign --verify --strict -R`（Apple 発行の Developer ID、Team `KBU2LK9533` = Kentaro Ejima）、公証済み | 例外として承認（2026-11-12）。リンクが AppTranslocation（一時領域）を指していたため `/Applications` 側へ張り直し |
+| Docker Desktop | `/Applications/Docker.app`（公式 DMG、自己更新。CLI は `~/.docker/bin`） | アプリ本体の `codesign --verify --deep --strict -R`（Apple 発行の Developer ID、Team `9BNSXJN65R` = Docker Inc） | 例外として承認（2026-11-12）。sbx-setup がテンプレートを `docker buildx` でビルドするために必要 |
 | Claude Code | `~/.local/bin/claude` → `~/.local/share/claude/versions/*`（公式ネイティブインストーラー、自己更新） | 実体が `~/.local/share/claude/versions/*` にあること、`codesign --verify --strict -R`（Apple 発行の Developer ID、Team `Q6L2SF6YDW` = Anthropic PBC） | 例外として承認（2026-11-11）。代替案: nixpkgs `claude-code`（固定できるが更新が遅れる）、`DISABLE_AUTOUPDATER` で版をリポジトリ管理（手間） |
 
 ## Nix の版の遅れ（2026-11-12 時点、flake.lock = nixpkgs-unstable @ 2026-11-06）
@@ -113,10 +114,9 @@ AGENTS.md の「ホスト側で版を決めない」の例外。**公式が推�
 | nushell / betterleaks / textlint / rtk / agent-browser | 0.116.1 / 1.9.0 / 15.7.1 / 1.1.0 / 0.41.1 | 0.117.0 / 1.10.0 / 15.8.0 / 1.2.0 / 0.42.0 | minor 1 |
 | mise | 2026.10.17 | 2026.11.6 | 約 3 週 |
 | pnpm | 12.9.0 | 12.18.0 | minor 9 |
-| ctx7 | 0.8.2 | 0.11.0 | minor 3 |
 | T3 Code（参考・廃止） | 0.1.6 | 0.1.9 | 1,169 commit 以上 → 公式 DMG（例外）へ |
 
-大半は patch〜minor 1 の遅れで、AGENTS.md の判定（同レベル・A vs B は Nix）を変える理由はない。pnpm / ctx7 / mise は遅れが大きいが、
+大半は patch〜minor 1 の遅れで、AGENTS.md の判定（同レベル・A vs B は Nix）を変える理由はない。pnpm / mise は遅れが大きいが、
 既知の CVE（判定 3）には当たらないため Nix のまま。機能差で困るものが出たら、T3 Code と同様に個別に再判定する。
 
 ## npm ツールの導入時検証（2026-11-12）

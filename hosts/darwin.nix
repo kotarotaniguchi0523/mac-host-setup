@@ -23,7 +23,11 @@
   };
 
   # Unfree packages are allowed by name only (AGENTS.md).
-  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ ];
+  nixpkgs.config.allowUnfreePredicate =
+    pkg:
+    builtins.elem (lib.getName pkg) [
+      "docker-sbx" # Docker Sandboxes CLI (AUDIT.md)
+    ];
 
   # --- System --------------------------------------------------------------------------
   system.primaryUser = user;
