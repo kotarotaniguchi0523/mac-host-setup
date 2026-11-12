@@ -56,14 +56,15 @@ fi
 exception() { # <name> -> "team<TAB>path" from exceptions.tsv (exit 1 when not listed)
   awk -F'\t' -v n="$1" '$1 == n { print $2 "\t" $3; found = 1 } END { exit !found }' "$repo/exceptions.tsv"
 }
+signed_by() { # <path> <team>: Apple-issued Developer ID certificate of <team> (bundles: --deep)
+  codesign --verify --deep --strict -R="anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] and certificate leaf[field.1.2.840.113635.100.6.1.13] and certificate leaf[subject.OU] = \"$2\"" "$1" 2>/dev/null
+}
 verify_vendor() { # <name> <entry in ~/.local/bin> <team> <expected path glob>
-  local real req want="${4/#\~/$HOME}"
+  local real want="${4/#\~/$HOME}"
   real="$(readlink -f "$2" 2>/dev/null || echo "$2")"
   # shellcheck disable=SC2053 # glob match is intended
   [[ "$real" == $want ]] || { add "exception: $1 resolves to $real, expected $want"; return; }
-  req="anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] and certificate leaf[field.1.2.840.113635.100.6.1.13] and certificate leaf[subject.OU] = \"$3\""
-  codesign --verify --strict -R="$req" "$real" 2>/dev/null ||
-    add "exception: $1 ($real) is not signed with a Developer ID of team $3"
+  signed_by "$real" "$3" || add "exception: $1 ($real) is not signed with a Developer ID of team $3"
 }
 if [[ -d "$HOME/.local/bin" ]]; then
   strays=()
@@ -77,6 +78,12 @@ if [[ -d "$HOME/.local/bin" ]]; then
   done < <(find "$HOME/.local/bin" -mindepth 1 -maxdepth 1 \( -type f -o -type l \))
   [[ ${#strays[@]} -gt 0 ]] && add "stray: ~/.local/bin has ${strays[*]}"
 fi
+# App bundles in exceptions.tsv (GUI apps installed from the vendor's notarized DMG)
+while IFS=$'\t' read -r name team path; do
+  [[ "$path" == *.app ]] || continue
+  if [[ ! -d "$path" ]]; then add "exception: $name not found at $path"
+  elif ! signed_by "$path" "$team"; then add "exception: $name ($path) is not signed with a Developer ID of team $team"; fi
+done < <(grep -v '^#' "$repo/exceptions.tsv")
 if command -v npm >/dev/null 2>&1; then
   npm_g="$(npm ls -g --depth=0 --parseable 2>/dev/null | tail -n +2 | xargs -n1 basename 2>/dev/null | grep -vE '^(npm|corepack)$' | paste -sd' ' -)"
   [[ -n "$npm_g" ]] && add "stray: npm -g has $npm_g"

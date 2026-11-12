@@ -18,7 +18,9 @@
     gh
     # --- runtimes (only the default line is global; older lines are per project via mise)
     nodejs_26
-    python315
+    # pip included, so `pip` / `pip3` are this Python's (not macOS's /usr/bin/pip3 = Python 3.9).
+    # Installs outside a venv are still refused: PIP_REQUIRE_VIRTUALENV (mise/mise.toml [env]).
+    (python315.withPackages (ps: [ ps.pip ]))
     go_1_27
     rustc
     cargo
@@ -43,8 +45,6 @@
     opencode
     pi-coding-agent
     agent-browser
-    # --- GUI apps (AGENTS.md: App Store -> nixpkgs -> vendor dmg)
-    t3code # T3 Code desktop + `t3` CLI, built from source
     ctx7
   ];
 

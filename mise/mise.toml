@@ -10,6 +10,8 @@
 "github:init-co-jp/diff-tour" = "v0.6.0"
 # ax: not in nixpkgs. github backend verifies the published checksums.txt (ubi: had none).
 "github:yusukebe/ax"          = "v0.1.25"
+# T3 Code CLI (`t3`). The desktop app is the vendor DMG (exceptions.tsv); nixpkgs lagged 1,169 commits.
+"npm:t3"                      = "0.1.8"
 "npm:secretlint"              = "13.0.7"
 
 [settings]

@@ -40,7 +40,6 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | pi | 1.5.0 (`pi-coding-agent`) | B | checksum（C） | **Nix** | 上流は同じ earendil-works/pi |
 | agent-browser | 0.41.1 | B（fromSource） | npm | **Nix** | |
 | ctx7 | 0.8.2 | B | npm | **Nix** | |
-| T3 Code（デスクトップ + `t3` CLI） | 0.1.6 (`t3code`) | B（ソース + pnpm 依存をハッシュ固定、nixpkgs の Electron） | 公式 DMG 0.1.8: Developer ID + 公証だが自己更新（版を固定できない） | **Nix**（ユーザー判断、2026-11-11） | GUI アプリの規則（App Store に無し → nixpkgs）。CLI も同梱のため mise の `npm:t3` は廃止 |
 
 ## mise で入れるもの（`mise/mise.toml`）
 
@@ -50,6 +49,7 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | `github:microsoft/waza` | nixpkgs に無い | checksum（C） |
 | `aqua:microsoft/tgrep` | nixpkgs に無い | checksum（C） |
 | `github:init-co-jp/diff-tour` | nixpkgs に無い | checksum（C） |
+| `npm:t3` | T3 Code の CLI。nixpkgs の `t3code`（0.1.6）は上流 0.1.8 から 1,169 commit 遅れていたため不採用（2026-11-12） | npm SLSA provenance（Takumi Guard 経由） |
 | `npm:secretlint` | nixpkgs に無い | npm（Takumi Guard 経由） |
 | `github:yusukebe/ax` | nixpkgs に無い。`ubi:` は検証なし（E）、`github:` は公開 `checksums.txt` で検証（C）。ユーザー承認（2026-11-11） | checksum（C） |
 
@@ -94,4 +94,28 @@ AGENTS.md の「ホスト側で版を決めない」の例外。**公式が推�
 
 | もの | 場所 | 検証（check.sh が毎回確認） | 判断 |
 |---|---|---|---|
+| T3 Code（デスクトップ） | `/Applications/T3 Code (Beta).app`（公式 DMG、自己更新） | アプリ本体の `codesign --verify --deep --strict -R`（Apple 発行の Developer ID、Team `ARK85ZXQ4Z` = T3 Tools, Inc.）、公証済み | 例外として承認（2026-11-12）。nixpkgs 版は 0.1.6 で 1,169 commit 遅れ、機能差が大きい。CLI は mise `npm:t3` |
 | Claude Code | `~/.local/bin/claude` → `~/.local/share/claude/versions/*`（公式ネイティブインストーラー、自己更新） | 実体が `~/.local/share/claude/versions/*` にあること、`codesign --verify --strict -R`（Apple 発行の Developer ID、Team `Q6L2SF6YDW` = Anthropic PBC） | 例外として承認（2026-11-11）。代替案: nixpkgs `claude-code`（固定できるが更新が遅れる）、`DISABLE_AUTOUPDATER` で版をリポジトリ管理（手間） |
+
+## Nix の版の遅れ（2026-11-12 時点、flake.lock = nixpkgs-unstable @ 2026-11-06）
+
+「最新」は上流の最新リリース（`mise latest`。公開 2 日未満を含む）。flake.lock は週次の flake-lock workflow で 2 日以上前の commit へ進む。
+
+| ツール | Nix | 最新 | 遅れ |
+|---|---|---|---|
+| gh / gopls / jq / jujutsu / doppler / dotenvx | 2.103.3 / 0.24.0 / 1.8.2 / 0.47.1 / 3.77.1 / 2.38.2 | 同じ | なし |
+| node | 26.13.0 | 26.13.1 | patch 1 |
+| python | 3.15.0 | 3.15.2 | patch 2（vulnix で該当 CVE なし） |
+| go | 1.27.3 | 1.27.4 | patch 1 |
+| rust | 1.99.0 | 1.99.1 | patch 1 |
+| uv | 0.13.5 | 0.13.7 | patch 2 |
+| codex / opencode / pi | 0.167.0 / 2.2.5 / 1.5.0 | 0.167.1 / 2.2.7 / 1.5.2 | patch 1〜2 |
+| rust-analyzer | 2026-11-02 | 2026-11-09 | 1 週 |
+| nushell / betterleaks / textlint / rtk / agent-browser | 0.116.1 / 1.9.0 / 15.7.1 / 1.1.0 / 0.41.1 | 0.117.0 / 1.10.0 / 15.8.0 / 1.2.0 / 0.42.0 | minor 1 |
+| mise | 2026.10.17 | 2026.11.6 | 約 3 週 |
+| pnpm | 12.9.0 | 12.18.0 | minor 9 |
+| ctx7 | 0.8.2 | 0.11.0 | minor 3 |
+| T3 Code（参考・廃止） | 0.1.6 | 0.1.9 | 1,169 commit 以上 → 公式 DMG（例外）へ |
+
+大半は patch〜minor 1 の遅れで、AGENTS.md の判定（同レベル・A vs B は Nix）を変える理由はない。pnpm / ctx7 / mise は遅れが大きいが、
+既知の CVE（判定 3）には当たらないため Nix のまま。機能差で困るものが出たら、T3 Code と同様に個別に再判定する。
