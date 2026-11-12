@@ -60,6 +60,9 @@
   # The config file itself is copied by tools/update.sh (not managed here: mise writes its lock).
   programs.mise = {
     enable = true;
+    # Official release binary pinned in pkgs/mise-bin.json (attestation + GPG verified by
+    # tools/ci/mise-bin-update.sh); nixpkgs' build lagged ~3 weeks behind upstream.
+    package = pkgs.callPackage ../pkgs/mise-bin.nix { };
     enableZshIntegration = true;
   };
 }

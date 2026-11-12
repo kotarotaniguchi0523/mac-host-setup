@@ -98,7 +98,5 @@ jobs:
           persist-credentials: false
       - name: install Nix (pinned + verified, same script as the host)
         run: tools/install-nix.sh
-      - name: CI mise matches flake.lock
-        run: tools/ci/check-mise-version.sh
       - name: nixfmt / flake check / build
         run: tools/ci/nix-check.sh

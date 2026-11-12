@@ -11,6 +11,7 @@
 | `flake.nix` / `flake.lock` | Nix の入力（nixpkgs / nix-darwin / home-manager）を rev + narHash で固定 |
 | `hosts/darwin.nix` | システム設定（Nix の信頼設定・Homebrew 無効） |
 | `home/` | ユーザー設定（Nix で入れる CLI、launchd の点検 agent） |
+| `pkgs/` | 自前の Nix パッケージ（`mise-bin.nix`: mise の公式バイナリ。版と sha256 は `mise-bin.json`） |
 | `mise/mise.toml` / `mise/mise.lock` | mise のグローバル設定（`~/.config/mise/` へコピー） |
 | `skills/` | APM の Skills 宣言（Windows 版と同じ） |
 | `tools/` | 導入・点検・適用・比較のスクリプト（共通処理は `tools/lib.sh`） |
@@ -45,7 +46,8 @@ mise trust . && mise install --locked && hk install   # このリポジトリ用
 |---|---|
 | `ci.yml` | push / PR で **lint**（hk: betterleaks / shellcheck / pii / jactionlint / pinact）・**mise-lock**（`tools/ci/mise-lock.sh --check`）・**nix**（macOS ランナーで `tools/install-nix.sh` → `tools/ci/nix-check.sh`: nixfmt / flake check / システム全体のビルド） |
 | `flake-lock.yml` | 週次。各 input を **2 日以上前の最新 commit** へ（`tools/ci/flake-lock-update.sh`）。ビルドしてから PR を作り、ci を起動 |
-| `.github/actions/setup-mise` | CI の mise（ホストと同じ版。flake.lock の mise とずれたら nix ジョブが失敗する） |
+| `.github/actions/setup-mise` | CI の mise（`pkgs/mise-bin.json` の版 = ホストと同じ） |
+| `mise-bin.yml` | 週次。mise の公式リリース（2 日以上前の最新）を **GitHub attestation + GPG 署名**で検証して `pkgs/mise-bin.json` を更新し、lock も作り直して PR |
 | `mise-relock.yml` | Renovate の PR で mise の lock を再生成して push し、ci を起動（Mend の Renovate は `mise lock` を実行できない） |
 
 ## GitHub の設定（Windows 版と同等）

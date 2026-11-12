@@ -1,0 +1,58 @@
+# Weekly mise update: pin the newest official release that is at least 2 days old, after verifying
+# its GitHub attestation and GPG-signed SHASUMS256 (tools/ci/mise-bin-update.sh), then regenerate the
+# mise lockfiles with that mise (lockfile fields can change between versions). The PR gets ci.yml
+# dispatched on its branch, where nix builds the host with the new mise.
+name: mise-bin
+
+on:
+  schedule:
+    - cron: "0 21 * * 2" # Wed 06:00 JST
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: mise-bin
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  update:
+    name: update pkgs/mise-bin.json
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: write # push the update branch
+      pull-requests: write # open / update the PR
+      actions: write # dispatch ci.yml on the PR branch
+      attestations: read # gh attestation verify
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BRANCH: mise-bin/update
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: true # zizmor: artipacked -- needed to push the update branch
+      - name: verify and pin the newest release (>= 2 days old)
+        id: pin
+        run: tools/ci/mise-bin-update.sh
+      - uses: ./.github/actions/setup-mise # installs the mise just pinned
+        if: steps.pin.outputs.changed == 'true'
+      - name: relock with the new mise
+        if: steps.pin.outputs.changed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: tools/ci/mise-lock.sh --write
+      - name: push, open / update the PR, start ci
+        if: steps.pin.outputs.changed == 'true'
+        run: |
+          version="$(jq -r .version pkgs/mise-bin.json)"
+          tools/ci/push-and-dispatch.sh "$BRANCH" "chore(deps): update mise to $version (attestation + GPG verified)" \
+            pkgs/mise-bin.json mise/mise.lock mise.lock
+          if [[ -z "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')" ]]; then
+            gh pr create --head "$BRANCH" --base main --title "chore(deps): update mise to $version" \
+              --body "Official release binary, verified with its GitHub attestation and the GPG-signed SHASUMS256 before pinning (tools/ci/mise-bin-update.sh). ci.yml builds the host with it on this branch."
+          fi

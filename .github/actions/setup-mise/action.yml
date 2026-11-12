@@ -1,8 +1,7 @@
 name: setup-mise
 description: >-
-  jdx/mise-action with the same mise as the host. The version must equal nixpkgs' mise in
-  flake.lock (lockfile fields differ between mise versions); tools/ci/check-mise-version.sh
-  fails the nix job when they drift.
+  jdx/mise-action with the same mise as the host: the version pinned in pkgs/mise-bin.json
+  (lockfile fields differ between mise versions, so CI and the host must match).
 inputs:
   install:
     description: install the tools of ./mise.toml
@@ -10,8 +9,11 @@ inputs:
 runs:
   using: composite
   steps:
+    - id: pin
+      shell: bash
+      run: echo "version=$(jq -r .version pkgs/mise-bin.json)" >> "$GITHUB_OUTPUT"
     - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
       with:
-        version: 2026.10.17
+        version: ${{ steps.pin.outputs.version }}
         install: ${{ inputs.install }}
         cache: true

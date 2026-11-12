@@ -14,8 +14,8 @@ base="${1:-}" head="${2:-HEAD}"
 # area -> extended regex over changed paths. Shared infrastructure (lib.sh, this script, ci.yml,
 # the setup-mise action) belongs to every area that uses it.
 shared='^(tools/lib\.sh|tools/ci/changes\.sh|\.github/workflows/ci\.yml)$'
-nix_re='(\.nix$|^flake\.lock$|^tools/install-nix\.sh$|^tools/ci/(nix-check|check-mise-version)\.sh$|^\.github/actions/setup-mise/)'
-mise_re='(^mise\.(toml|lock)$|^mise/|^tools/ci/mise-lock\.sh$|^\.github/actions/setup-mise/)'
+nix_re='(\.nix$|^flake\.lock$|^pkgs/|^tools/install-nix\.sh$|^tools/ci/nix-check\.sh$)'
+mise_re='(^mise\.(toml|lock)$|^mise/|^pkgs/mise-bin\.json$|^tools/ci/mise-lock\.sh$|^\.github/actions/setup-mise/)'
 
 if [[ -z "$base" || "$base" =~ ^0+$ ]] || ! git cat-file -e "$base^{commit}" 2>/dev/null; then
   files=""; all=true

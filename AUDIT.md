@@ -18,7 +18,7 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | ツール | nixpkgs 版 | Nix | mise の Security | 判定 | 備考 |
 |---|---|---|---|---|---|
 | gh | 2.103.3 | B | checksum, github_attestations（A） | **Nix**（A vs B） | 暫定の `~/.local/bin/gh` は撤去する |
-| mise | 2026.10.17 | B | —（自身） | **Nix** | mise レーンの起点 |
+| mise | 2026.11.5（`pkgs/mise-bin.nix`） | **A**（公式リリースバイナリ。GitHub attestation + GPG 署名付き SHASUMS256 を `tools/ci/mise-bin-update.sh` で検証してから版と sha256 を固定、Nix が fetchurl で再検証） | —（自身） | **Nix（公式バイナリ）** | nixpkgs の `mise` は約 3 週間遅れ（nixpkgs 自体が未追従）のため置き換え（2026-11-12）。週次 `mise-bin.yml` が 2 日以上前の最新へ更新 PR |
 | node | 26.13.0 (`nodejs_26`) | B | checksum, gpg（A） | **Nix**（A vs B） | 24 系はグローバルに置かない（プロジェクト単位で mise） |
 | python | 3.15.0 (`python315`) | B | checksum, github_attestations（A） | **Nix**（A vs B） | Windows は 3.15.2。vulnix の結果で再判定（下記） |
 | go | 1.27.3 (`go_1_27`) | B | checksum（C） | **Nix** | |
