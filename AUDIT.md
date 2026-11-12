@@ -25,13 +25,11 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | rust | 1.99.0（rustc/cargo/clippy/rustfmt） | B | [none]（E） | **Nix** | Windows は rustup |
 | rust-analyzer | 2026-11-02 | B | [none]（E） | **Nix** | Windows は winget |
 | uv | 0.13.5 | B | checksum, github_attestations（A） | **Nix**（A vs B） | |
-| pnpm | 12.9.0 | B | github_attestations（A） | **Nix**（A vs B） | Windows は 12.15.0 |
 | gopls | 0.24.0 | B | — | **Nix** | |
 | jq | 1.8.2 | B | checksum, github_attestations（A） | **Nix**（A vs B） | |
 | jujutsu | 0.47.1 | B | checksum（C） | **Nix** | |
 | nushell | 0.116.1 | B | checksum（C） | **Nix** | |
 | betterleaks | 1.9.0 | B | checksum, cosign（A） | **Nix**（A vs B） | |
-| textlint | 15.7.1 | B | npm | **Nix** | Windows は 15.8.0 |
 | rtk | 1.1.0 | B | checksum（C） | **Nix** | |
 | pi | 1.5.0 (`pi-coding-agent`) | B | checksum（C） | **Nix** | 上流は同じ earendil-works/pi |
 | agent-browser | 0.41.1 | B（fromSource） | npm | **Nix** | |
@@ -47,6 +45,9 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | `github:init-co-jp/diff-tour` | nixpkgs に無い | checksum（C） |
 | `npm:t3` | T3 Code の CLI。nixpkgs の `t3code`（0.1.6）は上流 0.1.8 から 1,169 commit 遅れていたため不採用（2026-11-12） | npm SLSA provenance（Takumi Guard 経由） |
 | `npm:agent-desktop` | nixpkgs に無い。macOS 対応（npm の os に darwin）。postinstall で同梱バイナリを link するため `allow_builds` で本パッケージのみ許可 | npm SLSA provenance（Takumi Guard 経由） |
+| `pnpm` | nixpkgs は 12.9.0 のまま 39 日未追従（2026-11-12 移行） | github_attestations（A） |
+| `npm:textlint` | nixpkgs は 15.7.1 のまま 102 日未追従（2026-11-12 移行） | npm SLSA provenance（aube が導入時に検証） |
+| `github:h4ckf0r0day/obscura` | nixpkgs は 0.2.2 のまま 53 日未追従。上流に checksums / attestation は無い（E）が、ユーザー承認（2026-11-12）。mise.lock の sha256 は GitHub のアセット digest と一致を確認（macos-arm64 / linux-x64） | lock のハッシュ固定のみ（E） |
 | `npm:secretlint` | nixpkgs に無い | npm（Takumi Guard 経由） |
 | `github:yusukebe/ax` | nixpkgs に無い。`ubi:` は検証なし（E）、`github:` は公開 `checksums.txt` で検証（C）。ユーザー承認（2026-11-11） | checksum（C） |
 
@@ -116,3 +117,10 @@ AGENTS.md の「ホスト側で版を決めない」の例外。**公式が推�
 
 大半は patch〜minor 1 の遅れで、AGENTS.md の判定（同レベル・A vs B は Nix）を変える理由はない。pnpm / ctx7 / mise は遅れが大きいが、
 既知の CVE（判定 3）には当たらないため Nix のまま。機能差で困るものが出たら、T3 Code と同様に個別に再判定する。
+
+## npm ツールの導入時検証（2026-11-12）
+
+mise 2026.10.17 では npm: ツールを pnpm で導入しており、**導入時に npm の provenance は検証されていなかった**。
+mise 2026.11.5 は paranoid 下で pnpm を拒否する（provenance を検証できないため）。`[settings.npm] package_manager` を
+組み込みの **aube** に変更し、Takumi Guard（`npm.flatt.tech`）経由で provenance を検証して導入できることを確認した
+（npm:t3 / agent-desktop / secretlint / textlint）。

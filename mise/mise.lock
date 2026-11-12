@@ -36,6 +36,34 @@ checksum_source = "mise-versions"
 url = "https://github.com/microsoft/tgrep/releases/download/v1.2.4/tgrep-v1.2.4-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/microsoft/tgrep/releases/assets/660041073"
 
+[[tools."github:h4ckf0r0day/obscura"]]
+version = "0.2.6"
+backend = "github:h4ckf0r0day/obscura"
+specifiers = ["v0.2.6"]
+
+[tools."github:h4ckf0r0day/obscura".options]
+asset_pattern = "obscura-x86_64-linux.tar.gz"
+
+[tools."github:h4ckf0r0day/obscura"."platforms.linux-x64"]
+checksum = "sha256:eed986e478c5ec5439f531f2d7fb6b0e36a356f1df7a6c44a8e8fd4f2486bd76"
+checksum_source = "mise-versions"
+url = "https://github.com/h4ckf0r0day/obscura/releases/download/v0.2.6/obscura-x86_64-linux.tar.gz"
+url_api = "https://api.github.com/repos/h4ckf0r0day/obscura/releases/assets/696469085"
+
+[[tools."github:h4ckf0r0day/obscura"]]
+version = "0.2.6"
+backend = "github:h4ckf0r0day/obscura"
+specifiers = ["v0.2.6"]
+
+[tools."github:h4ckf0r0day/obscura".options]
+asset_pattern = "obscura-aarch64-macos.tar.gz"
+
+[tools."github:h4ckf0r0day/obscura"."platforms.macos-arm64"]
+checksum = "sha256:19faa248ac762f466ddb822dbb03ed4f097312d10d1a4d5b2143e6040a9bebd0"
+checksum_source = "mise-versions"
+url = "https://github.com/h4ckf0r0day/obscura/releases/download/v0.2.6/obscura-aarch64-macos.tar.gz"
+url_api = "https://api.github.com/repos/h4ckf0r0day/obscura/releases/assets/696469088"
+
 [[tools."github:init-co-jp/diff-tour"]]
 version = "0.6.0"
 backend = "github:init-co-jp/diff-tour"
@@ -104,3 +132,25 @@ specifiers = ["13.0.7"]
 version = "0.1.8"
 backend = "npm:t3"
 specifiers = ["0.1.8"]
+
+[[tools."npm:textlint"]]
+version = "15.8.0"
+backend = "npm:textlint"
+specifiers = ["15.8.0"]
+
+[[tools.pnpm]]
+version = "12.19.0"
+backend = "aqua:pnpm/pnpm"
+specifiers = ["12.19.0"]
+
+[tools.pnpm."platforms.linux-x64"]
+checksum = "sha256:bf37edf4e26c3b31c1cac42c769ffabcb9231e9bc728762aeb1ee86bc711684a"
+url = "https://github.com/pnpm/pnpm/releases/download/v12.19.0/pnpm-linux-x64.tar.gz"
+url_api = "https://api.github.com/repos/pnpm/pnpm/releases/assets/729563509"
+provenance = "github-attestations"
+
+[tools.pnpm."platforms.macos-arm64"]
+checksum = "sha256:034aa9694d02e9345e56ffa2e6660b5c6ace2f27c99f6ea84db9bf50034315d6"
+url = "https://github.com/pnpm/pnpm/releases/download/v12.19.0/pnpm-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/pnpm/pnpm/releases/assets/729563507"
+provenance = "github-attestations"

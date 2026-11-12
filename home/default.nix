@@ -28,7 +28,6 @@
     rustfmt
     # --- language tooling
     uv
-    pnpm
     gopls
     rust-analyzer
     # --- CLI
@@ -36,7 +35,6 @@
     jujutsu
     nushell
     betterleaks
-    textlint
     rtk
     # --- AI agents
     pi-coding-agent

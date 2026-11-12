@@ -4,6 +4,13 @@
 # Only tools whose decision in AUDIT.md is "mise" belong here (AGENTS.md: Nix first, mise when its
 # verification level is clearly higher, or when nixpkgs cannot provide it). Exact pins only.
 [tools]
+# Moved from Nix (nixpkgs had not packaged a newer release for 39 / 102 days, AUDIT.md).
+pnpm                          = "12.19.0"
+"npm:textlint"                = "15.8.0"
+# obscura: headless browser for AI agents. nixpkgs had 0.2.2 (53 days behind). No checksums or
+# attestation upstream: the hash mise records in mise.lock on first lock is what is enforced.
+# The plain (not stealth / no-render) build, chosen per platform.
+"github:h4ckf0r0day/obscura"  = { version = "v0.2.6", platforms = { macos-arm64 = { asset_pattern = "obscura-aarch64-macos.tar.gz" }, linux-x64 = { asset_pattern = "obscura-x86_64-linux.tar.gz" } } }
 "aqua:k1LoW/mo"               = "1.7.0"
 "github:microsoft/waza"       = "v0.39.0"
 "aqua:microsoft/tgrep"        = "1.2.4"
@@ -25,7 +32,10 @@ minimum_release_age      = "2d"
 pin                      = true
 
 [settings.npm]
-package_manager = "pnpm"
+# aube (mise's built-in installer) verifies npm provenance at install time. With paranoid on,
+# mise >= 2026.11 refuses pnpm/npm as the installer because they cannot. It writes its resolved
+# dependency graph to ~/.config/mise/locks/ on install (host-local, not tracked).
+package_manager = "aube"
 
 [settings.pypi]
 registry_url = "https://pypi.flatt.tech/simple/{}/"
