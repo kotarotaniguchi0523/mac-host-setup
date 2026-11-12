@@ -52,6 +52,7 @@ echo "[ok] nix-darwin activated"
 install_global_mise_config "$HOME/.config/mise"
 host_path # mise and the runtimes it needs (node / pnpm, python / uv) come from the new profiles
 command -v mise >/dev/null || die "mise not found after activation" 4
+github_auth # checksum / attestation lookups hit the GitHub API
 # install, then drop versions no tracked config uses any more (e.g. a tool moved from mise to
 # Nix) and rebuild the shims, so a removed tool cannot shadow its Nix replacement.
 mise_global install --locked

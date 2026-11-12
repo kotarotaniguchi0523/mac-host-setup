@@ -12,6 +12,7 @@ set -euo pipefail
 mode="${1:-}"
 case "$mode" in --check | --write) ;; *) die "usage: mise-lock.sh --check|--write" 2 ;; esac
 platforms="macos-arm64,linux-x64"
+github_auth # CI passes GITHUB_TOKEN; on the host the gh token is used
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 export MISE_TRUSTED_CONFIG_PATHS="$work"

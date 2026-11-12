@@ -22,6 +22,16 @@ host_path() {
   export PATH="/etc/profiles/per-user/$USER/bin:/run/current-system/sw/bin:$PATH"
 }
 
+# GitHub API auth for mise (release lookups, checksum / attestation checks): unauthenticated
+# requests share a 60/h per-IP limit. The gh token is short-lived (expiring OAuth), so it is read
+# fresh for this process only and never stored. No-op when gh is missing or logged out.
+github_auth() {
+  [[ -n "${GITHUB_TOKEN:-}" ]] && return 0
+  local token
+  token="$(gh auth token 2>/dev/null)" || return 0
+  export GITHUB_TOKEN="$token"
+}
+
 # mise for the global lane only (run from $HOME so this repository's mise.toml does not apply).
 mise_global() { (cd "$HOME" && mise "$@"); }
 
