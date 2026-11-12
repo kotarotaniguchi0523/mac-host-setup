@@ -64,6 +64,15 @@
       "lockFileMaintenance": {
         "enabled": false
       }
+    },
+    {
+      "description": "minor / patch は必須チェック（lint / mise-lock / nix）が通れば自動マージ。major と pin / digest は手動",
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "automerge": true,
+      "platformAutomerge": true
     }
   ],
   "mise": {
@@ -71,12 +80,15 @@
   },
   "vulnerabilityAlerts": {
     "enabled": true,
-    "description": "脆弱性アラート由来の更新は、スケジュール・リリース経過日数・Dashboard 承認を迂回して即座に PR を作る（CI 再構築までは automerge しない）",
+    "description": "脆弱性アラート由来の更新は、スケジュール・リリース経過日数・Dashboard 承認を迂回して即座に PR を作り、必須チェックが通れば自動マージする",
     "schedule": [
       "at any time"
     ],
     "minimumReleaseAge": null,
-    "groupName": null
+    "groupName": null,
+    "automerge": true,
+    "platformAutomerge": true
   },
-  "osvVulnerabilityAlerts": true
+  "osvVulnerabilityAlerts": true,
+  "automergeStrategy": "squash"
 }

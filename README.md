@@ -47,3 +47,13 @@ mise trust . && mise install --locked && hk install   # このリポジトリ用
 | `flake-lock.yml` | 週次。各 input を **2 日以上前の最新 commit** へ（`tools/ci/flake-lock-update.sh`）。ビルドしてから PR を作り、ci を起動 |
 | `.github/actions/setup-mise` | CI の mise（ホストと同じ版。flake.lock の mise とずれたら nix ジョブが失敗する） |
 | `mise-relock.yml` | Renovate の PR で mise の lock を再生成して push し、ci を起動（Mend の Renovate は `mise lock` を実行できない） |
+
+## GitHub の設定（Windows 版と同等）
+
+| 項目 | 設定 |
+|---|---|
+| `main` の保護 | 必須チェック `lint` / `mise-lock` / `nix`、linear history、force push・削除の禁止（管理者は直接 push 可） |
+| マージ | squash / rebase のみ（merge commit なし）、auto-merge 可、マージ後にブランチ削除 |
+| Actions | GitHub 製と `jdx/mise-action` のみ許可、**SHA 固定を必須**、workflow の既定権限は read |
+| セキュリティ | secret scanning + push protection、Dependabot アラート、private vulnerability reporting |
+| Renovate | minor / patch と脆弱性修正は必須チェックが通れば自動マージ。major と pin / digest は手動 |

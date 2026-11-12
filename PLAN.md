@@ -4,7 +4,6 @@
 
 1. **agent-desktop**: Windows 専用のため未導入（AUDIT.md）。
 2. **CI の残り**（ci / flake-lock / mise-relock は作成済み）:
-   - 必須チェック（ruleset）と Renovate の automerge の復帰
    - flake.lock の「2 日」を commit 日時ではなく channel の進行日時で判定する
    - vulnix の定期実行（誤検知は whitelist に根拠付きで登録）、APM の検証
 3. **Skills（APM / skillspector）**: macOS での入手元を判定し、`skills-apply` 相当を `tools/` に用意。
