@@ -39,8 +39,6 @@
     textlint
     rtk
     # --- AI agents
-    codex
-    opencode
     pi-coding-agent
     agent-browser
     ctx7

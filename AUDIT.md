@@ -33,8 +33,6 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | betterleaks | 1.9.0 | B | checksum, cosign（A） | **Nix**（A vs B） | |
 | textlint | 15.7.1 | B | npm | **Nix** | Windows は 15.8.0 |
 | rtk | 1.1.0 | B | checksum（C） | **Nix** | |
-| codex | 0.167.0 | B | npm | **Nix** | |
-| opencode | 2.2.5 | B（fromSource） | npm | **Nix** | 上流は同じ anomalyco/opencode |
 | pi | 1.5.0 (`pi-coding-agent`) | B | checksum（C） | **Nix** | 上流は同じ earendil-works/pi |
 | agent-browser | 0.41.1 | B（fromSource） | npm | **Nix** | |
 | ctx7 | 0.8.2 | B | npm | **Nix** | |
@@ -48,6 +46,7 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | `aqua:microsoft/tgrep` | nixpkgs に無い | checksum（C） |
 | `github:init-co-jp/diff-tour` | nixpkgs に無い | checksum（C） |
 | `npm:t3` | T3 Code の CLI。nixpkgs の `t3code`（0.1.6）は上流 0.1.8 から 1,169 commit 遅れていたため不採用（2026-11-12） | npm SLSA provenance（Takumi Guard 経由） |
+| `npm:agent-desktop` | nixpkgs に無い。macOS 対応（npm の os に darwin）。postinstall で同梱バイナリを link するため `allow_builds` で本パッケージのみ許可 | npm SLSA provenance（Takumi Guard 経由） |
 | `npm:secretlint` | nixpkgs に無い | npm（Takumi Guard 経由） |
 | `github:yusukebe/ax` | nixpkgs に無い。`ubi:` は検証なし（E）、`github:` は公開 `checksums.txt` で検証（C）。ユーザー承認（2026-11-11） | checksum（C） |
 
@@ -56,8 +55,7 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | ツール | 理由 |
 |---|---|
 | herdr | 使わない（ユーザー判断、2026-11-11）。参考: nixpkgs に無く、mise も `[none]`（E） |
-| doppler / dotenvx | 使わない（ユーザー判断、2026-11-12）。秘密情報は 1Password で扱う |
-| agent-desktop | Windows のデスクトップ操作用（win32 バイナリ前提）。macOS で必要か要確認 |
+| doppler / dotenvx / codex / opencode | 使わない（ユーザー判断、2026-11-12）。doppler / dotenvx は秘密情報を 1Password で扱うため |
 | ghtkn | Windows の git credential helper。macOS は gh の期限付きトークン（`gh auth setup-git`）を使う |
 | openclaw | 使わない（ユーザー判断、2026-11-11）。参考: nixpkgs が insecure 指定（プロンプトインジェクション、既定でシステム全体にアクセス） |
 | apm / skillspector | Skills レーン（PLAN.md）で別途判定 |
@@ -108,7 +106,7 @@ AGENTS.md の「ホスト側で版を決めない」の例外。**公式が推�
 | go | 1.27.3 | 1.27.4 | patch 1 |
 | rust | 1.99.0 | 1.99.1 | patch 1 |
 | uv | 0.13.5 | 0.13.7 | patch 2 |
-| codex / opencode / pi | 0.167.0 / 2.2.5 / 1.5.0 | 0.167.1 / 2.2.7 / 1.5.2 | patch 1〜2 |
+| pi | 1.5.0 | 1.5.2 | patch 2 |
 | rust-analyzer | 2026-11-02 | 2026-11-09 | 1 週 |
 | nushell / betterleaks / textlint / rtk / agent-browser | 0.116.1 / 1.9.0 / 15.7.1 / 1.1.0 / 0.41.1 | 0.117.0 / 1.10.0 / 15.8.0 / 1.2.0 / 0.42.0 | minor 1 |
 | mise | 2026.10.17 | 2026.11.6 | 約 3 週 |

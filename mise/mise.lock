@@ -77,6 +77,14 @@ checksum = "sha256:94633f9d61c743cffcf51e5338289d974c21428efb70bd2995e6c6ec13e06
 url = "https://github.com/yusukebe/ax/releases/download/v0.1.25/ax-darwin-arm64"
 url_api = "https://api.github.com/repos/yusukebe/ax/releases/assets/502198739"
 
+[[tools."npm:agent-desktop"]]
+version = "1.2.0"
+backend = "npm:agent-desktop"
+specifiers = ["1.2.0"]
+
+[tools."npm:agent-desktop".options]
+allow_builds = '["agent-desktop"]'
+
 [[tools."npm:secretlint"]]
 version = "13.0.7"
 backend = "npm:secretlint"

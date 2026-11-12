@@ -2,7 +2,6 @@
 
 ## 未完了
 
-1. **agent-desktop**: Windows 専用のため未導入（AUDIT.md）。
 2. **CI の残り**（ci / flake-lock / mise-relock は作成済み）:
    - flake.lock の「2 日」を commit 日時ではなく channel の進行日時で判定する
    - vulnix の定期実行（誤検知は whitelist に根拠付きで登録）、APM の検証

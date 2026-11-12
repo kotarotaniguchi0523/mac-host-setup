@@ -12,6 +12,9 @@
 "github:yusukebe/ax"          = "v0.1.25"
 # T3 Code CLI (`t3`). The desktop app is the vendor DMG (exceptions.tsv); nixpkgs lagged 1,169 commits.
 "npm:t3"                      = "0.1.8"
+# agent-desktop: Vercel Labs desktop automation CLI (darwin / win32 / linux). Not in nixpkgs.
+# npm SLSA provenance; the postinstall links the bundled native binary, so allow only its build.
+"npm:agent-desktop"           = { version = "1.2.0", allow_builds = ["agent-desktop"] }
 "npm:secretlint"              = "13.0.7"
 
 [settings]
