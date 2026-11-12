@@ -93,6 +93,7 @@ AGENTS.md の「ホスト側で版を決めない」の例外。**公式が推�
 | もの | 場所 | 検証（check.sh が毎回確認） | 判断 |
 |---|---|---|---|
 | T3 Code（デスクトップ） | `/Applications/T3 Code (Beta).app`（公式 DMG、自己更新） | アプリ本体の `codesign --verify --deep --strict -R`（Apple 発行の Developer ID、Team `ARK85ZXQ4Z` = T3 Tools, Inc.）、公証済み | 例外として承認（2026-11-12）。nixpkgs 版は 0.1.6 で 1,169 commit 遅れ、機能差が大きい。CLI は mise `npm:t3` |
+| Kanary（CLI） | `~/.local/bin/kanary` → `/Applications/Kanary.app/Contents/Helpers/kanary`（公式アプリ同梱、アプリと一緒に自己更新） | 置き場所、`codesign --verify --strict -R`（Apple 発行の Developer ID、Team `KBU2LK9533` = Kentaro Ejima）、公証済み | 例外として承認（2026-11-12）。リンクが AppTranslocation（一時領域）を指していたため `/Applications` 側へ張り直し |
 | Claude Code | `~/.local/bin/claude` → `~/.local/share/claude/versions/*`（公式ネイティブインストーラー、自己更新） | 実体が `~/.local/share/claude/versions/*` にあること、`codesign --verify --strict -R`（Apple 発行の Developer ID、Team `Q6L2SF6YDW` = Anthropic PBC） | 例外として承認（2026-11-11）。代替案: nixpkgs `claude-code`（固定できるが更新が遅れる）、`DISABLE_AUTOUPDATER` で版をリポジトリ管理（手間） |
 
 ## Nix の版の遅れ（2026-11-12 時点、flake.lock = nixpkgs-unstable @ 2026-11-06）
