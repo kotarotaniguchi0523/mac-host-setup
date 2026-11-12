@@ -58,8 +58,14 @@
     # In .zshenv (every zsh: login, interactive, `zsh -c` from tools and agents), not .zprofile
     # (login shells only). Appended after the PATH /etc/zshenv (nix-darwin) sets; `typeset -U`
     # keeps it from repeating when a nested shell reads it again.
+    # mise shims for non-interactive shells only (mise's recommendation): `mise activate` (.zshrc)
+    # runs only in interactive shells, so without them the global mise tools (pnpm, textlint, ...)
+    # are missing from scripts and agents' `zsh -c`. Interactive shells must not get them:
+    # `mise activate` moves the shims ahead of the Nix profiles, and a shim of a repo-only tool
+    # (e.g. betterleaks) then fails outside that repo with "No version is set".
     envExtra = ''
       typeset -U path
+      [[ -o interactive ]] || path+=("$HOME/.local/share/mise/shims")
       path+=("$HOME/.docker/bin" "$HOME/.local/bin")
     '';
   };

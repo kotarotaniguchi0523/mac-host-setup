@@ -96,6 +96,10 @@ macOS ホストへのソフトウェア導入・更新では、**サプライチ
   `nix` / `gh` / `sbx` が見つからなければ `. tools/lib.sh && nix_env && host_path` を先に実行する。commit / push の hook（hk）も `nix` を必要とする。
 - **PATH の追加は `~/.zshenv`（home-manager の `programs.zsh.envExtra`）に書く。** `~/.zprofile` はログインシェルでしか読まれず、
   非ログインのターミナルや `zsh -c` で `claude` が見つからなくなった。宣言の外のディレクトリ（`~/.local/bin` など）は**後ろに追加**し、宣言済みツールを優先させる。
+- **mise のグローバルツールは `mise activate`（`.zshrc`、対話シェルのみ）で PATH に入る。** 非対話シェル（`zsh -c`・スクリプト）には
+  `.zshenv` で mise の shims を足す。対話シェルには足さない（`mise activate` が shims を Nix より前へ動かし、
+  リポジトリ専用ツールの shim がリポジトリの外で「No version is set」になる）。PATH を変えたら、`env -i` で
+  `zsh -c` / `-ic` / `-lc` / `-lic` のそれぞれを、リポジトリの外と中の両方で確かめる。
 - **home-manager は既存の dotfile を置き換える。** 既存の内容（PATH など）を移さずに管理下へ入れない。退避は `backupFileExtension`。
 - sudo が必要な `tools/update.sh` / `tools/install-nix.sh` は TTY が要るので、ユーザーが Terminal.app で実行する。
 
