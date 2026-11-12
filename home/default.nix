@@ -55,8 +55,12 @@
     # ~/.local/bin holds installs made outside these declarations (Claude Code's own installer).
     # Appended (after the Nix profiles) so a declared tool always wins over a stray one;
     # tools/check.sh still reports what is in there (AUDIT.md "既知の野良").
-    profileExtra = ''
-      export PATH="$PATH:$HOME/.docker/bin:$HOME/.local/bin"
+    # In .zshenv (every zsh: login, interactive, `zsh -c` from tools and agents), not .zprofile
+    # (login shells only). Appended after the PATH /etc/zshenv (nix-darwin) sets; `typeset -U`
+    # keeps it from repeating when a nested shell reads it again.
+    envExtra = ''
+      typeset -U path
+      path+=("$HOME/.docker/bin" "$HOME/.local/bin")
     '';
   };
 
