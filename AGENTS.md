@@ -100,6 +100,8 @@ macOS ホストへのソフトウェア導入・更新では、**サプライチ
   `.zshenv` で mise の shims を足す。対話シェルには足さない（`mise activate` が shims を Nix より前へ動かし、
   リポジトリ専用ツールの shim がリポジトリの外で「No version is set」になる）。PATH を変えたら、`env -i` で
   `zsh -c` / `-ic` / `-lc` / `-lic` のそれぞれを、リポジトリの外と中の両方で確かめる。
+- **zsh を通らないプロセス（GUI アプリとして起動した AI エージェント、そこから起動される bash / sh）は launchd の PATH を使う。**
+  `home/launchd.nix` の `session-path` がログインのたびに `launchctl setenv PATH` で設定する。PATH の並びを変えるときは `.zshenv` とこちらの両方を直す。
 - **home-manager は既存の dotfile を置き換える。** 既存の内容（PATH など）を移さずに管理下へ入れない。退避は `backupFileExtension`。
 - sudo が必要な `tools/update.sh` / `tools/install-nix.sh` は TTY が要るので、ユーザーが Terminal.app で実行する。
 
