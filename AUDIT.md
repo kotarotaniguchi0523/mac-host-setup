@@ -31,8 +31,6 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | jujutsu | 0.47.1 | B | checksum（C） | **Nix** | |
 | nushell | 0.116.1 | B | checksum（C） | **Nix** | |
 | betterleaks | 1.9.0 | B | checksum, cosign（A） | **Nix**（A vs B） | |
-| doppler | 3.77.1 | B | checksum（C） | **Nix** | |
-| dotenvx | 2.38.2 | B | checksum（C） | **Nix** | |
 | textlint | 15.7.1 | B | npm | **Nix** | Windows は 15.8.0 |
 | rtk | 1.1.0 | B | checksum（C） | **Nix** | |
 | codex | 0.167.0 | B | npm | **Nix** | |
@@ -58,6 +56,7 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | ツール | 理由 |
 |---|---|
 | herdr | 使わない（ユーザー判断、2026-11-11）。参考: nixpkgs に無く、mise も `[none]`（E） |
+| doppler / dotenvx | 使わない（ユーザー判断、2026-11-12）。秘密情報は 1Password で扱う |
 | agent-desktop | Windows のデスクトップ操作用（win32 バイナリ前提）。macOS で必要か要確認 |
 | ghtkn | Windows の git credential helper。macOS は gh の期限付きトークン（`gh auth setup-git`）を使う |
 | openclaw | 使わない（ユーザー判断、2026-11-11）。参考: nixpkgs が insecure 指定（プロンプトインジェクション、既定でシステム全体にアクセス） |
@@ -103,7 +102,7 @@ AGENTS.md の「ホスト側で版を決めない」の例外。**公式が推�
 
 | ツール | Nix | 最新 | 遅れ |
 |---|---|---|---|
-| gh / gopls / jq / jujutsu / doppler / dotenvx | 2.103.3 / 0.24.0 / 1.8.2 / 0.47.1 / 3.77.1 / 2.38.2 | 同じ | なし |
+| gh / gopls / jq / jujutsu | 2.103.3 / 0.24.0 / 1.8.2 / 0.47.1 | 同じ | なし |
 | node | 26.13.0 | 26.13.1 | patch 1 |
 | python | 3.15.0 | 3.15.2 | patch 2（vulnix で該当 CVE なし） |
 | go | 1.27.3 | 1.27.4 | patch 1 |

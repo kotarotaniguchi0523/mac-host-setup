@@ -36,8 +36,6 @@
     jujutsu
     nushell
     betterleaks
-    doppler
-    dotenvx
     textlint
     rtk
     # --- AI agents
