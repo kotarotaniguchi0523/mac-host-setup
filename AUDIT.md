@@ -86,5 +86,4 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | もの | 場所 | 入れ方 | 方針（ユーザー判断待ち） |
 |---|---|---|---|
 | Claude Code | `~/.local/bin/claude` → `~/.local/share/claude/versions/*` | 公式インストーラー（自己更新） | nixpkgs `claude-code` へ移すか、自己更新を例外として認めるか |
-| T3 Code (Beta)（公式 DMG）と `t3` シム | `/Applications/T3 Code (Beta).app`、`~/.local/bin/t3` | 公式 DMG | Nix 版へ移行後に削除（ユーザー確認のうえ） |
 | Docker Desktop | `~/.docker/bin`（`/Applications/Docker.app`） | 公式 dmg（推定） | GUI アプリの規則（公式 dmg の署名・公証確認）で記録する |
