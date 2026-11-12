@@ -49,9 +49,31 @@ else
 fi
 
 # --- strays -----------------------------------------------------------------------------
+# Approved exceptions (AUDIT.md "例外"): self-updating vendor installs. Instead of reporting them
+# as strays, verify every run that they are still signed + notarized by the expected developer.
+approved_team() {
+  case "$1" in
+    claude) echo "Q6L2SF6YDW" ;; # Claude Code, Developer ID Application: Anthropic PBC
+    *) return 1 ;;
+  esac
+}
+verify_vendor() { # <name> <path> <team>
+  local real team
+  real="$(readlink -f "$2" 2>/dev/null || echo "$2")"
+  if ! codesign --verify --strict "$real" 2>/dev/null; then
+    add "exception: $1 ($real) fails codesign verification"; return
+  fi
+  team="$(codesign -dv "$real" 2>&1 | sed -n 's/^TeamIdentifier=//p')"
+  [[ "$team" == "$3" ]] || add "exception: $1 is signed by team '${team:-none}', expected $3"
+  spctl -a -t install "$real" >/dev/null 2>&1 || add "exception: $1 is not accepted by Gatekeeper (notarization)"
+}
 if [[ -d "$HOME/.local/bin" ]]; then
-  local_bins="$(find "$HOME/.local/bin" -mindepth 1 -maxdepth 1 \( -type f -o -type l \) -exec basename {} \; | paste -sd' ' -)"
-  [[ -n "$local_bins" ]] && add "stray: ~/.local/bin has $local_bins"
+  strays=()
+  while IFS= read -r f; do
+    name="$(basename "$f")"
+    if team="$(approved_team "$name")"; then verify_vendor "$name" "$f" "$team"; else strays+=("$name"); fi
+  done < <(find "$HOME/.local/bin" -mindepth 1 -maxdepth 1 \( -type f -o -type l \))
+  [[ ${#strays[@]} -gt 0 ]] && add "stray: ~/.local/bin has ${strays[*]}"
 fi
 if command -v npm >/dev/null 2>&1; then
   npm_g="$(npm ls -g --depth=0 --parseable 2>/dev/null | tail -n +2 | xargs -n1 basename 2>/dev/null | grep -vE '^(npm|corepack)$' | paste -sd' ' -)"

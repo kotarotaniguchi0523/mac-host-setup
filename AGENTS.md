@@ -11,6 +11,7 @@ macOS ホストへのソフトウェア導入・更新では、**サプライチ
   導入は必ず「宣言」（`flake.nix` 配下 / `mise/mise.toml`）に書く。宣言の外にあるものは「野良」として扱う。
 - **ホスト側で版を決めない**: `mise upgrade` / `mise use` / `nix flake update` / ツール自身の self-update をホストで実行しない。
   版の更新は GitHub 上の PR（Renovate / CI）でのみ行う。
+  例外は `AUDIT.md`「例外」に載せたもの（公式が自己更新を前提とし、`tools/check.sh` が署名・Team ID・公証を毎回検証する）。
 
 ## バージョン固定（Pin）
 
