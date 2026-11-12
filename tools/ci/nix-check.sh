@@ -2,17 +2,13 @@
 # nix-check.sh - format check, flake check and a full build of the nix-darwin system (no activation).
 # Usage: tools/ci/nix-check.sh   (host or CI; needs Nix)
 set -euo pipefail
-repo="$(cd "$(dirname "$0")/../.." && pwd)"
+# shellcheck source=tools/lib.sh
+. "$(dirname "$0")/../lib.sh"
 cd "$repo"
-# shellcheck disable=SC1091
-[[ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]] && . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-export NIX_CONFIG="extra-experimental-features = nix-command flakes"
+nix_env
 
-mapfile_nix() { git ls-files '*.nix'; }
-# shellcheck disable=SC2046
-nix fmt -- --check $(mapfile_nix)
+git ls-files -z '*.nix' | xargs -0 nix fmt -- --check
 echo "[ok] nixfmt"
 nix flake check --impure --no-build
 echo "[ok] flake check"
-out="$(nix build --no-link --print-out-paths --impure .#darwinConfigurations.default.system)"
-echo "[ok] built $out"
+echo "[ok] built $(build_system)"

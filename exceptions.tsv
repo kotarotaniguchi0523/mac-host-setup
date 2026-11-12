@@ -1,0 +1,3 @@
+# Approved self-updating vendor installs (AGENTS.md / AUDIT.md "例外"). One per line, TAB-separated:
+# name<TAB>Developer ID team<TAB>where the ~/.local/bin entry must resolve (glob, ~ = $HOME)
+claude	Q6L2SF6YDW	~/.local/share/claude/versions/*

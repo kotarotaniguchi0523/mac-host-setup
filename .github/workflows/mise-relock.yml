@@ -38,12 +38,7 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
           persist-credentials: true # zizmor: artipacked -- needed to push to the PR branch
-      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
-        with:
-          # Same mise as the host (nixpkgs in flake.lock): lockfile fields differ between versions.
-          version: 2026.10.17
-          install: false
-          cache: true
+      - uses: ./.github/actions/setup-mise
       - name: regenerate lockfiles
         run: tools/ci/mise-lock.sh --write
       - name: push if changed
@@ -51,8 +46,4 @@ jobs:
           if git diff --quiet -- mise/mise.lock mise.lock; then
             echo "[i] lockfiles already up to date"; exit 0
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore(deps): relock mise" -- mise/mise.lock mise.lock
-          git push origin "HEAD:$HEAD_REF"
-          gh workflow run ci.yml --ref "$HEAD_REF"
+          tools/ci/push-and-dispatch.sh "$HEAD_REF" "chore(deps): relock mise" mise/mise.lock mise.lock

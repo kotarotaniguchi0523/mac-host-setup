@@ -12,8 +12,10 @@ on:
 
 permissions: {}
 
+# Keyed by branch, so the run that mise-relock / flake-lock dispatch on a PR branch replaces the
+# PR's own run (which saw the stale lockfile).
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 defaults:
@@ -32,10 +34,9 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0 # pii-check inspects commit author emails
-      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+      - uses: ./.github/actions/setup-mise
         with:
-          install: true
-          cache: true
+          install: "true"
       - name: hk (all files)
         env:
           HK_SKIP_STEPS: nixfmt,flake-check # need Nix; run in the nix job
@@ -51,12 +52,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
-        with:
-          # Same mise as the host (nixpkgs in flake.lock): lockfile fields differ between versions.
-          version: 2026.10.17
-          install: false
-          cache: true
+      - uses: ./.github/actions/setup-mise
       - name: lockfiles are up to date
         env:
           GITHUB_TOKEN: ${{ github.token }} # GitHub API rate limit for release lookups
@@ -74,5 +70,7 @@ jobs:
           persist-credentials: false
       - name: install Nix (pinned + verified, same script as the host)
         run: tools/install-nix.sh
+      - name: CI mise matches flake.lock
+        run: tools/ci/check-mise-version.sh
       - name: nixfmt / flake check / build
         run: tools/ci/nix-check.sh

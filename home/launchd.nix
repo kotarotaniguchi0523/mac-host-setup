@@ -1,9 +1,11 @@
 {
-  pkgs,
   home,
   repoDir,
   ...
 }:
+let
+  log = "${home}/Library/Logs/mac-host-setup-check.log";
+in
 {
   # Read-only daily check (replaces the Windows Task Scheduler job).
   # It never applies anything and never uses sudo: it fetches origin, compares the host
@@ -23,9 +25,8 @@
           Minute = 30;
         }
       ];
-      RunAtLoad = false;
-      StandardOutPath = "${home}/Library/Logs/mac-host-setup-check.log";
-      StandardErrorPath = "${home}/Library/Logs/mac-host-setup-check.log";
+      StandardOutPath = log;
+      StandardErrorPath = log;
     };
   };
 }

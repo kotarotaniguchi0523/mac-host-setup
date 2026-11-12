@@ -90,8 +90,8 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 ## 例外（自己更新を認めるもの）
 
 AGENTS.md の「ホスト側で版を決めない」の例外。**公式が推奨する導入方法が自己更新を前提**としているため、ユーザー判断で認める。
-代わりに `tools/check.sh` が毎回、**署名・Team ID・公証**を検証し、外れたら通知する（野良としては報告しない）。
+一覧の実体は `exceptions.tsv`（名前・Team ID・置き場所）。`tools/check.sh` が毎回、**置き場所**と **Apple 発行の Developer ID 証明書 + Team ID**（`codesign -R` の要件 1 つ）を検証し、外れたら通知する（野良としては報告しない）。
 
 | もの | 場所 | 検証（check.sh が毎回確認） | 判断 |
 |---|---|---|---|
-| Claude Code | `~/.local/bin/claude` → `~/.local/share/claude/versions/*`（公式ネイティブインストーラー、自己更新） | `codesign --verify --strict`、Team ID `Q6L2SF6YDW`（Developer ID Application: Anthropic PBC）、`spctl`（Notarized Developer ID） | 例外として承認（2026-11-11）。代替案: nixpkgs `claude-code`（固定できるが更新が遅れる）、`DISABLE_AUTOUPDATER` で版をリポジトリ管理（手間） |
+| Claude Code | `~/.local/bin/claude` → `~/.local/share/claude/versions/*`（公式ネイティブインストーラー、自己更新） | 実体が `~/.local/share/claude/versions/*` にあること、`codesign --verify --strict -R`（Apple 発行の Developer ID、Team `Q6L2SF6YDW` = Anthropic PBC） | 例外として承認（2026-11-11）。代替案: nixpkgs `claude-code`（固定できるが更新が遅れる）、`DISABLE_AUTOUPDATER` で版をリポジトリ管理（手間） |

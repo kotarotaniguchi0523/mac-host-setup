@@ -4,44 +4,38 @@
 # Usage: tools/ci/mise-lock.sh --check   exit 1 when a lockfile is missing entries or out of date
 #        tools/ci/mise-lock.sh --write   update the lockfiles in place (used by mise-relock.yml)
 #
-# The global lane (mise/mise.toml) is locked in an isolated config dir so the host's real
-# ~/.config/mise is never touched. Platforms: the host (macos-arm64) and CI (linux-x64).
+# Both lanes are locked on copies in a temp dir, so the host's ~/.config/mise and the working
+# tree are never touched by --check. Platforms: the host (macos-arm64) and CI (linux-x64).
 set -euo pipefail
-mode="${1:?usage: mise-lock.sh --check|--write}"
-repo="$(cd "$(dirname "$0")/../.." && pwd)"
+# shellcheck source=tools/lib.sh
+. "$(dirname "$0")/../lib.sh"
+mode="${1:-}"
+case "$mode" in --check | --write) ;; *) die "usage: mise-lock.sh --check|--write" 2 ;; esac
 platforms="macos-arm64,linux-x64"
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
+export MISE_TRUSTED_CONFIG_PATHS="$work"
 
-# --- global lane ------------------------------------------------------------------------
-mkdir -p "$work/cfg"
-cp "$repo/mise/mise.toml" "$work/cfg/config.toml"
-[[ -f "$repo/mise/mise.lock" ]] && cp "$repo/mise/mise.lock" "$work/cfg/mise.lock"
-(cd "$work" && MISE_CONFIG_DIR="$work/cfg" MISE_GLOBAL_CONFIG_FILE="$work/cfg/config.toml" \
-  MISE_DATA_DIR="$work/data" MISE_CACHE_DIR="$work/cache" \
-  mise lock --global --platform "$platforms")
-
-# --- repository dev tools ---------------------------------------------------------------
-(cd "$repo" && mise trust --quiet . && mise lock --platform "$platforms")
+# global lane (isolated config dir; the shared cache dir is reused)
+install_global_mise_config "$work/global"
+(cd "$work" && MISE_CONFIG_DIR="$work/global" MISE_GLOBAL_CONFIG_FILE="$work/global/config.toml" \
+  MISE_DATA_DIR="$work/data" mise lock --global --platform "$platforms")
+# repository dev tools
+mkdir -p "$work/repo"
+cp "$repo/mise.toml" "$repo/mise.lock" "$work/repo/"
+(cd "$work/repo" && mise lock --platform "$platforms")
 
 status=0
-if [[ "$mode" == "--check" ]]; then
-  if ! cmp -s "$work/cfg/mise.lock" "$repo/mise/mise.lock"; then
-    echo "::error file=mise/mise.lock::mise/mise.lock is out of date (run tools/ci/mise-lock.sh --write)"
-    diff -u "$repo/mise/mise.lock" "$work/cfg/mise.lock" || true
+for pair in "global/mise.lock:mise/mise.lock" "repo/mise.lock:mise.lock"; do
+  new="$work/${pair%%:*}" cur="$repo/${pair#*:}"
+  cmp -s "$new" "$cur" && continue
+  if [[ "$mode" == --write ]]; then
+    cp "$new" "$cur"; echo "[ok] wrote ${pair#*:}"
+  else
+    echo "::error file=${pair#*:}::${pair#*:} is out of date (run tools/ci/mise-lock.sh --write)"
+    diff -u "$cur" "$new" || true
     status=1
   fi
-  if ! git -C "$repo" diff --quiet -- mise.lock; then
-    echo "::error file=mise.lock::mise.lock is out of date (run tools/ci/mise-lock.sh --write)"
-    git -C "$repo" diff -- mise.lock
-    git -C "$repo" checkout -- mise.lock
-    status=1
-  fi
-  [[ $status -eq 0 ]] && echo "[ok] mise lockfiles are up to date"
-elif [[ "$mode" == "--write" ]]; then
-  cp "$work/cfg/mise.lock" "$repo/mise/mise.lock"
-  echo "[ok] wrote mise/mise.lock and mise.lock"
-else
-  echo "unknown mode: $mode" >&2; exit 2
-fi
+done
+[[ $status -eq 0 && "$mode" == --check ]] && echo "[ok] mise lockfiles are up to date"
 exit $status

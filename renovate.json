@@ -2,7 +2,6 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended",
-    ":dependencyDashboard",
     ":semanticCommits",
     ":enableVulnerabilityAlertsWithLabel(security)"
   ],
@@ -38,8 +37,7 @@
         "github-actions"
       ],
       "groupName": "GitHub Actions",
-      "groupSlug": "github-actions",
-      "pinDigests": true
+      "groupSlug": "github-actions"
     },
     {
       "description": "グループ3: Skills（APM）を 1 PR にまとめる（apm.yml の owner/repo#ref を更新）",
@@ -66,50 +64,19 @@
       "lockFileMaintenance": {
         "enabled": false
       }
-    },
-    {
-      "description": "Major updates get separate PRs and merge after required CI succeeds",
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "groupName": null,
-      "dependencyDashboardApproval": false
-    },
-    {
-      "description": "Minor and patch updates merge after required CI succeeds",
-      "matchUpdateTypes": [
-        "minor",
-        "patch"
-      ],
-      "automerge": false
     }
   ],
   "mise": {
     "updatePinnedDependencies": true
   },
-  "lockFileMaintenance": {
-    "enabled": true,
-    "schedule": [
-      "before 6am on the first day of the month"
-    ]
-  },
   "vulnerabilityAlerts": {
     "enabled": true,
-    "labels": [
-      "security"
-    ],
     "description": "脆弱性アラート由来の更新は、スケジュール・リリース経過日数・Dashboard 承認を迂回して即座に PR を作る（CI 再構築までは automerge しない）",
     "schedule": [
       "at any time"
     ],
     "minimumReleaseAge": null,
-    "dependencyDashboardApproval": false,
-    "groupName": null,
-    "automerge": false
+    "groupName": null
   },
-  "osvVulnerabilityAlerts": true,
-  "ignorePaths": [],
-  "automerge": false,
-  "automergeStrategy": "squash",
-  "dependencyDashboardApproval": false
+  "osvVulnerabilityAlerts": true
 }

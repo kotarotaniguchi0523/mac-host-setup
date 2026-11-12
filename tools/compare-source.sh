@@ -7,36 +7,46 @@
 # Read-only: evaluates the pinned nixpkgs from flake.lock and asks mise for its Security line.
 # The decision itself is written to AUDIT.md by a human (or agent) from this output.
 set -uo pipefail
-repo="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck source=tools/lib.sh
+. "$(dirname "$0")/lib.sh"
 attr="${1:?usage: compare-source.sh <nixpkgs-attr> [<mise-tool>]}"
 tool="${2:-$1}"
-export NIX_CONFIG="extra-experimental-features = nix-command flakes"
-pkgs="$repo#darwinConfigurations.default.pkgs"
+nix_env
 
 echo "== Nix (nixpkgs pinned by flake.lock) : $attr"
-ev() { nix eval --impure "$@" 2>/dev/null; }
-version="$(ev --raw "$pkgs.$attr.version")" || { echo "  not in nixpkgs"; version=""; }
-if [[ -n "$version" ]]; then
-  echo "  version          : $version"
-  prov="$(ev --json "$pkgs.$attr.meta.sourceProvenance" || echo 'unset')"
-  echo "  sourceProvenance : $prov   (fromSource -> B, binary* -> C, unset -> check src below)"
-  echo "  src.url          : $(ev --raw "$pkgs.$attr.src.url" || ev --raw "$pkgs.$attr.src.gitRepoUrl" || echo '?')"
-  echo "  src.outputHash   : $(ev --raw "$pkgs.$attr.src.outputHash" || echo '?')"
-  echo "  broken/darwin    : broken=$(ev --json "$pkgs.$attr.meta.broken" || echo '?') platforms-ok=$(ev --json --apply 'ps: builtins.elem "aarch64-darwin" ps' "$pkgs.$attr.meta.platforms" || echo '?')"
-  out="$(ev --raw "$pkgs.$attr.outPath")"
-  if [[ -n "$out" ]] && nix path-info --store https://cache.nixos.org --sigs "$out" >/tmp/.cs.$$ 2>/dev/null; then
-    echo "  cache.nixos.org  : present, $(grep -o 'cache.nixos.org-1:[^ ]*' /tmp/.cs.$$ | head -1 | cut -c1-40)..."
+# One evaluation for every field (each `nix eval --impure` re-evaluates the whole flake).
+info="$(nix eval --impure --json "$repo#darwinConfigurations.default.pkgs" --apply "pkgs:
+  let p = pkgs.\"$attr\" or null; t = e: (builtins.tryEval e).value or null; in
+  if p == null then null else {
+    version = t p.version;
+    provenance = t (map (s: s.shortName) (p.meta.sourceProvenance or [ ]));
+    srcUrl = t (p.src.url or p.src.gitRepoUrl or null);
+    srcHash = t (p.src.outputHash or null);
+    broken = t (p.meta.broken or false);
+    darwin = t (builtins.elem \"aarch64-darwin\" (p.meta.platforms or [ ]));
+    out = t p.outPath;
+  }" 2>/dev/null)"
+if [[ -z "$info" || "$info" == null ]]; then
+  echo "  not in nixpkgs"
+else
+  jq -r '"  version          : \(.version)",
+         "  sourceProvenance : \(.provenance)   (empty/fromSource -> B, binary* -> C)",
+         "  src.url          : \(.srcUrl)",
+         "  src.outputHash   : \(.srcHash)",
+         "  broken/darwin    : broken=\(.broken) aarch64-darwin=\(.darwin)"' <<<"$info"
+  out="$(jq -r .out <<<"$info")"
+  if sigs="$(nix path-info --store https://cache.nixos.org --sigs "$out" 2>/dev/null)"; then
+    echo "  cache.nixos.org  : present, $(grep -o 'cache.nixos.org-1:[^ ]*' <<<"$sigs" | head -1 | cut -c1-40)..."
   else
     echo "  cache.nixos.org  : NOT in cache (would build locally)"
   fi
-  rm -f /tmp/.cs.$$
 fi
 
 echo
 echo "== mise : $tool"
 if command -v mise >/dev/null 2>&1; then
-  (cd "$HOME" && mise tool "$tool" 2>&1 | grep -E '^(Backend|Security|Latest|Description)' | sed 's/^/  /') || echo "  mise tool failed"
-  echo "  latest (>= 2d)   : $(cd "$HOME" && mise latest "$tool" 2>/dev/null || echo '?')"
+  mise_global tool "$tool" 2>&1 | grep -E '^(Backend|Security|Description)' | sed 's/^/  /' || echo "  mise tool failed"
+  echo "  latest (>= 2d)   : $(mise_global latest "$tool" 2>/dev/null || echo '?')"
 else
   echo "  mise not installed"
 fi

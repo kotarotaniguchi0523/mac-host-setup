@@ -48,5 +48,8 @@ echo "[ok] installer verified (nix ${NIX_VERSION}, sha256 ${actual})"
 # --no-channel-add: no nix-channel; everything is pinned through flake.lock.
 sh "$work/install" --daemon --yes --no-channel-add
 
+# CI: later steps run in fresh shells that do not load the daemon profile.
+[[ -n "${GITHUB_PATH:-}" ]] && echo "/nix/var/nix/profiles/default/bin" >> "$GITHUB_PATH"
+
 echo
 echo "[ok] Nix ${NIX_VERSION} installed. Open a new terminal, then run: tools/update.sh --bootstrap"

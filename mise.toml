@@ -4,7 +4,7 @@
 hk          = "2.8.1"   # git hooks (hk.pkl)
 betterleaks = "1.9.0"   # secret scan (self-contained binary)
 shellcheck  = "0.11.0"  # tools/*.sh
-"github:jdx/jactionlint" = "v2.3.0"  # GitHub Actions lint (when workflows are added)
+"github:jdx/jactionlint" = "v2.3.0"  # GitHub Actions lint
 pinact      = "5.0.2"   # `uses:` must be pinned to a commit SHA
 
 # paranoid is a global-only setting (mise ignores it in project configs)

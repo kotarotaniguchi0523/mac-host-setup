@@ -29,32 +29,38 @@
       # personal value is committed. Build with --impure (tools/update.sh does this).
       user = builtins.getEnv "USER";
       home = builtins.getEnv "HOME";
+      # Fail loudly instead of building for user "" (e.g. evaluated without --impure, or under sudo -i).
+      checked =
+        assert user != "" && user != "root" && home != "";
+        true;
       repoDir = "${home}/src/mac-host-setup";
     in
     {
-      darwinConfigurations.default = nix-darwin.lib.darwinSystem {
-        inherit system;
-        specialArgs = {
-          inherit
-            self
-            user
-            home
-            repoDir
-            ;
+      darwinConfigurations.default =
+        assert checked;
+        nix-darwin.lib.darwinSystem {
+          specialArgs = {
+            inherit
+              system
+              self
+              user
+              home
+              repoDir
+              ;
+          };
+          modules = [
+            ./hosts/darwin.nix
+            home-manager.darwinModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              # Existing dotfiles (e.g. ~/.zshrc) are kept as *.before-home-manager instead of failing.
+              home-manager.backupFileExtension = "before-home-manager";
+              home-manager.extraSpecialArgs = { inherit user home repoDir; };
+              home-manager.users.${user} = import ./home;
+            }
+          ];
         };
-        modules = [
-          ./hosts/darwin.nix
-          home-manager.darwinModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            # Existing dotfiles (e.g. ~/.zshrc) are kept as *.before-home-manager instead of failing.
-            home-manager.backupFileExtension = "before-home-manager";
-            home-manager.extraSpecialArgs = { inherit user home repoDir; };
-            home-manager.users.${user} = import ./home;
-          }
-        ];
-      };
 
       formatter.${system} = nixpkgs.legacyPackages.${system}.nixfmt;
     };

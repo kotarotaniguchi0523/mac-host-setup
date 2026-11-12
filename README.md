@@ -13,7 +13,8 @@
 | `home/` | ユーザー設定（Nix で入れる CLI、launchd の点検 agent） |
 | `mise/mise.toml` / `mise/mise.lock` | mise のグローバル設定（`~/.config/mise/` へコピー） |
 | `skills/` | APM の Skills 宣言（Windows 版と同じ） |
-| `tools/` | 導入・点検・適用・比較のスクリプト |
+| `tools/` | 導入・点検・適用・比較のスクリプト（共通処理は `tools/lib.sh`） |
+| `exceptions.tsv` | 自己更新を認めた導入物（名前・Developer ID の Team・置き場所）。`tools/check.sh` が毎回検証 |
 
 ## 初回セットアップ
 
@@ -44,4 +45,5 @@ mise trust . && mise install --locked && hk install   # このリポジトリ用
 |---|---|
 | `ci.yml` | push / PR で **lint**（hk: betterleaks / shellcheck / pii / jactionlint / pinact）・**mise-lock**（`tools/ci/mise-lock.sh --check`）・**nix**（macOS ランナーで `tools/install-nix.sh` → `tools/ci/nix-check.sh`: nixfmt / flake check / システム全体のビルド） |
 | `flake-lock.yml` | 週次。各 input を **2 日以上前の最新 commit** へ（`tools/ci/flake-lock-update.sh`）。ビルドしてから PR を作り、ci を起動 |
+| `.github/actions/setup-mise` | CI の mise（ホストと同じ版。flake.lock の mise とずれたら nix ジョブが失敗する） |
 | `mise-relock.yml` | Renovate の PR で mise の lock を再生成して push し、ci を起動（Mend の Renovate は `mise lock` を実行できない） |

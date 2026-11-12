@@ -1,18 +1,19 @@
-amends "package://github.com/jdx/hk/releases/download/v2.6.0/hk@2.6.0#/Config.pkl"
-import "package://github.com/jdx/hk/releases/download/v2.6.0/hk@2.6.0#/Builtins.pkl"
+amends "package://github.com/jdx/hk/releases/download/v2.8.1/hk@2.8.1#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v2.8.1/hk@2.8.1#/Builtins.pkl"
 
 // Lint for this repository (macOS host)
 //  - betterleaks : secrets
-//  - shellcheck  : tools/*.sh
+//  - shellcheck  : tools/**/*.sh
 //  - pii         : no real home paths / user name committed (use $HOME / ~)
 //  - nix         : flake evaluates and is formatted (pre-push only; needs Nix)
-//  - jactionlint / pinact : GitHub Actions (only when workflows exist)
+//  - jactionlint / pinact : GitHub Actions workflows
 
 local all = new Mapping<String, Step> {
     ["betterleaks"] = Builtins.betterleaks
     ["shellcheck"] = new Step {
-        glob = List("tools/*.sh")
-        check = "shellcheck --severity=warning {{files}}"
+        glob = List("tools/**/*.sh")
+        // -x + source-path: follow `. lib.sh` (the directives name it relative to the repo root)
+        check = "shellcheck -x --source-path=. --severity=warning {{files}}"
     }
     ["pii"] = new Step {
         glob = List("**/*")

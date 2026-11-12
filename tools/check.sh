@@ -9,12 +9,15 @@
 #   system   : the active nix-darwin generation was built from the current HEAD
 #   mise     : ~/.config/mise matches mise/ and every locked tool is installed
 #   strays   : global installs outside the declarations (~/.local/bin, npm -g, uv tool, nix profile)
+#   exception: approved self-updating installs (exceptions.tsv) are still at their expected path and
+#              signed with a Developer ID of the expected team (instead of being reported as strays)
 # Writes .agent/update-report.json. Exit 0 = clean, 5 = needs attention.
 set -uo pipefail
-repo="$(cd "$(dirname "$0")/.." && pwd)"
+# shellcheck source=tools/lib.sh
+. "$(dirname "$0")/lib.sh"
 cd "$repo" || exit 4
 notify=0; [[ "${1:-}" == "--notify" ]] && notify=1
-export PATH="/run/current-system/sw/bin:/etc/profiles/per-user/$USER/bin:$PATH"
+host_path
 
 findings=()
 add() { findings+=("$1"); echo "[!] $1"; }
@@ -39,39 +42,38 @@ fi
 # --- mise -------------------------------------------------------------------------------
 if command -v mise >/dev/null 2>&1; then
   cmp -s "$repo/mise/mise.toml" "$HOME/.config/mise/config.toml" || add "mise: ~/.config/mise/config.toml differs from mise/mise.toml"
-  if [[ -f "$repo/mise/mise.lock" ]]; then
-    cmp -s "$repo/mise/mise.lock" "$HOME/.config/mise/mise.lock" || add "mise: ~/.config/mise/mise.lock differs from mise/mise.lock"
-  fi
-  missing="$(cd "$HOME" && mise ls --missing --no-header 2>/dev/null | awk '{print $1"@"$2}' | paste -sd' ' -)"
+  cmp -s "$repo/mise/mise.lock" "$HOME/.config/mise/mise.lock" || add "mise: ~/.config/mise/mise.lock differs from mise/mise.lock"
+  missing="$(mise_global ls --missing --no-header 2>/dev/null | awk '{print $1"@"$2}' | paste -sd' ' -)"
   [[ -n "$missing" ]] && add "mise: not installed: $missing"
 else
   add "mise: not found"
 fi
 
 # --- strays -----------------------------------------------------------------------------
-# Approved exceptions (AUDIT.md "例外"): self-updating vendor installs. Instead of reporting them
-# as strays, verify every run that they are still signed + notarized by the expected developer.
-approved_team() {
-  case "$1" in
-    claude) echo "Q6L2SF6YDW" ;; # Claude Code, Developer ID Application: Anthropic PBC
-    *) return 1 ;;
-  esac
+# Approved exceptions (exceptions.tsv): self-updating vendor installs. Instead of reporting them as
+# strays, verify every run that they still resolve to their expected location and are signed with an
+# Apple-issued Developer ID certificate of the expected team (one codesign requirement covers both).
+exception() { # <name> -> "team<TAB>path" from exceptions.tsv (exit 1 when not listed)
+  awk -F'\t' -v n="$1" '$1 == n { print $2 "\t" $3; found = 1 } END { exit !found }' "$repo/exceptions.tsv"
 }
-verify_vendor() { # <name> <path> <team>
-  local real team
+verify_vendor() { # <name> <entry in ~/.local/bin> <team> <expected path glob>
+  local real req want="${4/#\~/$HOME}"
   real="$(readlink -f "$2" 2>/dev/null || echo "$2")"
-  if ! codesign --verify --strict "$real" 2>/dev/null; then
-    add "exception: $1 ($real) fails codesign verification"; return
-  fi
-  team="$(codesign -dv "$real" 2>&1 | sed -n 's/^TeamIdentifier=//p')"
-  [[ "$team" == "$3" ]] || add "exception: $1 is signed by team '${team:-none}', expected $3"
-  spctl -a -t install "$real" >/dev/null 2>&1 || add "exception: $1 is not accepted by Gatekeeper (notarization)"
+  # shellcheck disable=SC2053 # glob match is intended
+  [[ "$real" == $want ]] || { add "exception: $1 resolves to $real, expected $want"; return; }
+  req="anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] and certificate leaf[field.1.2.840.113635.100.6.1.13] and certificate leaf[subject.OU] = \"$3\""
+  codesign --verify --strict -R="$req" "$real" 2>/dev/null ||
+    add "exception: $1 ($real) is not signed with a Developer ID of team $3"
 }
 if [[ -d "$HOME/.local/bin" ]]; then
   strays=()
   while IFS= read -r f; do
     name="$(basename "$f")"
-    if team="$(approved_team "$name")"; then verify_vendor "$name" "$f" "$team"; else strays+=("$name"); fi
+    if exc="$(exception "$name")"; then
+      verify_vendor "$name" "$f" "${exc%%$'\t'*}" "${exc#*$'\t'}"
+    else
+      strays+=("$name")
+    fi
   done < <(find "$HOME/.local/bin" -mindepth 1 -maxdepth 1 \( -type f -o -type l \))
   [[ ${#strays[@]} -gt 0 ]] && add "stray: ~/.local/bin has ${strays[*]}"
 fi
@@ -90,16 +92,9 @@ fi
 
 # --- report -----------------------------------------------------------------------------
 mkdir -p "$repo/.agent"
-{
-  printf '{\n  "checkedAt": "%s",\n  "head": "%s",\n  "ok": %s,\n  "findings": [' \
-    "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$head_rev" "$([[ ${#findings[@]} -eq 0 ]] && echo true || echo false)"
-  sep=""
-  for f in "${findings[@]+"${findings[@]}"}"; do
-    esc="${f//\\/\\\\}"; esc="${esc//\"/\\\"}"
-    printf '%s\n    "%s"' "$sep" "$esc"; sep=","
-  done
-  printf '\n  ]\n}\n'
-} > "$repo/.agent/update-report.json"
+jq -n --arg checkedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg head "$head_rev" \
+  '{checkedAt: $checkedAt, head: $head, ok: ($ARGS.positional | length == 0), findings: $ARGS.positional}' \
+  --args "${findings[@]+"${findings[@]}"}" > "$repo/.agent/update-report.json"
 
 if [[ ${#findings[@]} -eq 0 ]]; then
   echo "[ok] host matches origin/main ${head_rev:0:12}"
