@@ -117,6 +117,7 @@ url_api = "https://api.github.com/repos/yusukebe/ax/releases/assets/502198739"
 
 [[tools."npm:agent-desktop"]]
 version = "1.2.0"
+aube = { path = "locks/npm-agent-desktop/1.2.0~785137e1", digest = "sha256:79288f7bdffc6b7acfab1a66c99c97e790712114cc55546b53d6476ad51eec84" }
 backend = "npm:agent-desktop"
 specifiers = ["1.2.0"]
 
@@ -125,16 +126,19 @@ allow_builds = '["agent-desktop"]'
 
 [[tools."npm:secretlint"]]
 version = "13.0.7"
+aube = { path = "locks/npm-secretlint/13.0.7", digest = "sha256:ec0a52c4389e93d328bda3e74b46c36e2cc21e7fc8d031d246532b35d8581be7" }
 backend = "npm:secretlint"
 specifiers = ["13.0.7"]
 
 [[tools."npm:t3"]]
 version = "0.1.8"
+aube = { path = "locks/npm-t3/0.1.8", digest = "sha256:b5215f8f4b727dab9a7218680ccebcf3e2b87c78750876b9d10ef1d5ffa03ab6" }
 backend = "npm:t3"
 specifiers = ["0.1.8"]
 
 [[tools."npm:textlint"]]
 version = "15.8.0"
+aube = { path = "locks/npm-textlint/15.8.0", digest = "sha256:8bfe2b27fbaa50a89fcf879b0a2dd549a3d9cf844001ff993a499a1abddcdcde" }
 backend = "npm:textlint"
 specifiers = ["15.8.0"]
 

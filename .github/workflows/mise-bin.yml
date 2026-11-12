@@ -51,7 +51,7 @@ jobs:
         run: |
           version="$(jq -r .version pkgs/mise-bin.json)"
           tools/ci/push-and-dispatch.sh "$BRANCH" "chore(deps): update mise to $version (attestation + GPG verified)" \
-            pkgs/mise-bin.json mise/mise.lock mise.lock
+            pkgs/mise-bin.json mise/mise.lock mise/locks mise.lock
           if [[ -z "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')" ]]; then
             gh pr create --head "$BRANCH" --base main --title "chore(deps): update mise to $version" \
               --body "Official release binary, verified with its GitHub attestation and the GPG-signed SHASUMS256 before pinning (tools/ci/mise-bin-update.sh). ci.yml builds the host with it on this branch."

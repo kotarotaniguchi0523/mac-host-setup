@@ -34,7 +34,7 @@ pin                      = true
 [settings.npm]
 # aube (mise's built-in installer) verifies npm provenance at install time. With paranoid on,
 # mise >= 2026.11 refuses pnpm/npm as the installer because they cannot. It writes its resolved
-# dependency graph to ~/.config/mise/locks/ on install (host-local, not tracked).
+# dependency graphs to locks/ (tracked as mise/locks/, pinned by digest in mise.lock).
 package_manager = "aube"
 
 [settings.pypi]

@@ -26,6 +26,16 @@ cp "$repo/mise.toml" "$repo/mise.lock" "$work/repo/"
 (cd "$work/repo" && mise lock --platform "$platforms")
 
 status=0
+# aube's dependency graphs, referenced by digest from mise/mise.lock
+if ! diff -r -q "$work/global/locks" "$repo/mise/locks" >/dev/null 2>&1; then
+  if [[ "$mode" == --write ]]; then
+    rm -rf "$repo/mise/locks"; cp -R "$work/global/locks" "$repo/mise/locks"; echo "[ok] wrote mise/locks/"
+  else
+    echo "::error file=mise/locks::mise/locks/ is out of date (run tools/ci/mise-lock.sh --write)"
+    diff -r -q "$work/global/locks" "$repo/mise/locks" || true
+    status=1
+  fi
+fi
 for pair in "global/mise.lock:mise/mise.lock" "repo/mise.lock:mise.lock"; do
   new="$work/${pair%%:*}" cur="$repo/${pair#*:}"
   cmp -s "$new" "$cur" && continue

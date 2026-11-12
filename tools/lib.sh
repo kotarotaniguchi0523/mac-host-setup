@@ -25,11 +25,15 @@ host_path() {
 # mise for the global lane only (run from $HOME so this repository's mise.toml does not apply).
 mise_global() { (cd "$HOME" && mise "$@"); }
 
-# The global mise lane: mise/mise.toml -> <dir>/config.toml, mise/mise.lock -> <dir>/mise.lock
+# The global mise lane: mise/mise.toml -> <dir>/config.toml, mise/mise.lock -> <dir>/mise.lock,
+# mise/locks/ -> <dir>/locks/ (aube's npm dependency graphs; mise.lock pins them by digest)
 install_global_mise_config() {
   mkdir -p "$1"
   cp "$repo/mise/mise.toml" "$1/config.toml"
   cp "$repo/mise/mise.lock" "$1/mise.lock"
+  rm -rf "$1/locks"
+  [[ -d "$repo/mise/locks" ]] && cp -R "$repo/mise/locks" "$1/locks"
+  return 0
 }
 
 # The system the host activates and CI builds.

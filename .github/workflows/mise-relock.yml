@@ -43,7 +43,7 @@ jobs:
         run: tools/ci/mise-lock.sh --write
       - name: push if changed
         run: |
-          if git diff --quiet -- mise/mise.lock mise.lock; then
+          if git diff --quiet -- mise/mise.lock mise/locks mise.lock && [[ -z "$(git ls-files --others --exclude-standard -- mise/locks)" ]]; then
             echo "[i] lockfiles already up to date"; exit 0
           fi
-          tools/ci/push-and-dispatch.sh "$HEAD_REF" "chore(deps): relock mise" mise/mise.lock mise.lock
+          tools/ci/push-and-dispatch.sh "$HEAD_REF" "chore(deps): relock mise" mise/mise.lock mise/locks mise.lock
