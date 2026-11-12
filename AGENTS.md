@@ -77,3 +77,44 @@ macOS ホストへのソフトウェア導入・更新では、**サプライチ
 - **秘密はどこにも保存しない。** トークンは Keychain / 環境変数、CI は GitHub Secrets。
 - **公開しないデータは `.agent/` に置く（`.gitignore` 済み）。**
 - リポジトリにユーザー名・実パスを書かない（`$HOME` / `~` を使う）。
+
+## 作業時の注意（過去に実際に起きた失敗）
+
+エージェントが同じ失敗を繰り返さないための記録。どれも一度起きている。
+
+### 主張と検証
+
+- **確かめていないことを断定しない。** 対応プラットフォームはパッケージのメタデータ（npm の `os`/`cpu`、リリースの asset 名）で、
+  検証の有無（provenance・署名）は実際のコマンド出力で確認してから書く（「Windows 専用」「provenance 検証済み」を誤って断定した例がある）。
+- **版の遅れは「何版遅れ」ではなく「新しい版が公開されてから何日」で測る**（リリース頻度で見え方が変わるため）。
+- **途中の手順が失敗したら commit / push しない。** 失敗を直してから、まとめて 1 回で出す。
+
+### シェル・PATH
+
+- **スクリプトは bash（`#!/bin/bash`）で書く。** zsh は `set -- $var` で単語分割しない。macOS の `/bin/bash` は 3.2 なので `declare -A` は使えない（awk で代用）。
+- **エージェントのシェルには Nix・宣言済みツールの PATH が無いことがある**（起動時の環境を引き継ぐため）。
+  `nix` / `gh` / `sbx` が見つからなければ `. tools/lib.sh && nix_env && host_path` を先に実行する。commit / push の hook（hk）も `nix` を必要とする。
+- **PATH の追加は `~/.zshenv`（home-manager の `programs.zsh.envExtra`）に書く。** `~/.zprofile` はログインシェルでしか読まれず、
+  非ログインのターミナルや `zsh -c` で `claude` が見つからなくなった。宣言の外のディレクトリ（`~/.local/bin` など）は**後ろに追加**し、宣言済みツールを優先させる。
+- **home-manager は既存の dotfile を置き換える。** 既存の内容（PATH など）を移さずに管理下へ入れない。退避は `backupFileExtension`。
+- sudo が必要な `tools/update.sh` / `tools/install-nix.sh` は TTY が要るので、ユーザーが Terminal.app で実行する。
+
+### Nix
+
+- **`nix fmt` は必ずファイルを指定する**（`nix fmt -- <files>`）。引数なしだと nixfmt が標準入力を待って止まる。
+- `nix eval --raw` の出力には末尾の改行が無い。`read` で受けるなら `; echo` を足す。
+- **ビルド中に `.app` を実行するパッケージ（`versionCheckHook` など）は macOS で失敗することがある**
+  （`clearing flags of path …/X.app: Operation not permitted`）。`overrideAttrs { doInstallCheck = false; }` にして、
+  代わりに `tools/check.sh` で署名（Team ID）を確認する（`docker-sbx` の例）。
+
+### mise・GitHub API
+
+- **GitHub API は未認証だと 60 回/時で、mise の attestation 確認がすぐ止まる。** `tools/lib.sh` の `github_auth`（gh のトークンをそのプロセスにだけ渡す。保存しない）を使う。
+- **paranoid の mise は pnpm を拒否する。** npm バックエンドは `aube` を使い、依存グラフ `mise/locks/` も lock と一緒に commit する（ホスト専用ではない）。
+- github バックエンドで asset 名がプラットフォームごとに違うものは、プラットフォーム別の `asset_pattern` を書く（1 つのテンプレートだと別プラットフォームの lock に macOS の URL が入った）。
+
+### lint・CI
+
+- 公開されている鍵の指紋などが betterleaks に検出されたら、意味の分かる変数名にして `# gitleaks:allow` を付ける。
+- shellcheck に `lib.sh` を追わせるには `# shellcheck source=tools/lib.sh` と `-x` を使う。
+- push 直後は `gh run list -c <sha>` が空や 404 を返すことがある。`gh run list -L 5` で run ID を確かめてから `gh run watch <id>` する。
