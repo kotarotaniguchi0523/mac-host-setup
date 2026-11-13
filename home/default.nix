@@ -72,6 +72,12 @@
       [[ -o interactive ]] || path+=("$HOME/.local/share/mise/shims")
       path+=("$HOME/.docker/bin" "$HOME/.local/bin")
     '';
+    # 1Password Shell Plugins (interactive shells): `op plugin init <tool>` (e.g. npm for the
+    # Takumi Guard token) writes ~/.config/op/plugins.sh, which defines the wrapping aliases.
+    # The file holds no secret (only plugin references); it is created on the host, not here.
+    initContent = ''
+      [[ -f "$HOME/.config/op/plugins.sh" ]] && source "$HOME/.config/op/plugins.sh"
+    '';
   };
 
   # Puts the global mise tools (mise/mise.toml) on PATH in zsh, ahead of ~/.local/bin.

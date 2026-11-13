@@ -27,11 +27,16 @@
     pkg:
     builtins.elem (lib.getName pkg) [
       "docker-sbx" # Docker Sandboxes CLI (AUDIT.md)
+      "1password-cli" # 1Password CLI (AUDIT.md)
     ];
 
   # --- System --------------------------------------------------------------------------
   system.primaryUser = user;
   users.users.${user}.home = home;
+
+  # 1Password CLI. The module installs `op` at /usr/local/bin/op: the 1Password app integration
+  # (Touch ID, Shell Plugins) only works from that path. tools/check.sh verifies its signature.
+  programs._1password.enable = true;
 
   # Homebrew is not used (AGENTS.md). nix-darwin's homebrew module stays disabled.
   homebrew.enable = false;
