@@ -125,5 +125,7 @@ macOS ホストへのソフトウェア導入・更新では、**サプライチ
 ### lint・CI
 
 - 公開されている鍵の指紋などが betterleaks に検出されたら、意味の分かる変数名にして `# gitleaks:allow` を付ける。
+- pii チェックは CI では `$USER`（CI の実行ユーザー名）も個人情報として探す。その名前と同じ英単語をコメントや文書に書くと CI だけで落ちる。
+  push 前に `USER=<CI のユーザー名> tools/pii-check.sh <files>` で確かめる（CI のユーザー名は GitHub ホストランナーの既定値）。
 - shellcheck に `lib.sh` を追わせるには `# shellcheck source=tools/lib.sh` と `-x` を使う。
 - push 直後は `gh run list -c <sha>` が空や 404 を返すことがある。`gh run list -L 5` で run ID を確かめてから `gh run watch <id>` する。
