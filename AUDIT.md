@@ -90,6 +90,25 @@ APM（Nix の `apm-cli`）で `~/.claude/skills/` へ配置する（ターゲッ
 | explainer | main @ ccdd7ba | 変化なし |
 | waza / waza-interactive | v0.40.1 | 最新 |
 
+## Claude Code プラグイン（`claude-plugins/`、2026-11-13）
+
+Skill 以外（サブエージェント定義など）を含むプラグインは、Claude Code のプラグイン機能で入れる。
+`claude-plugins/.claude-plugin/marketplace.json` を**このリポジトリだけのマーケットプレイス**とし、各プラグインは
+`git-subdir` + 40 桁の commit `sha` で固定する（Claude Code はその commit を取得する）。
+
+- 適用: `tools/plugins-apply.sh`（`tools/update.sh` から実行）。`claude plugin marketplace add <repo>/claude-plugins`
+  （リポジトリを移動した後は同じ名前のまま新しい場所に付け替わる）→ `install` → `update`（宣言の commit へ移る）。
+- 点検: `tools/check.sh` が `~/.claude/plugins/installed_plugins.json` の `gitCommitSha` と宣言の `sha` を比べ、
+  有効化（`enabledPlugins`）とマーケットプレイスの場所も確認する。別のマーケットプレイスから入れたプラグインは野良として出す。
+- **`/plugin marketplace add cursor/plugins` / `/plugin install` を手で実行しない**（上流の `main` に追従し、版が宣言の外で決まる）。
+  自動更新もオンにしない。版の更新は `marketplace.json` の `sha` を変える PR で行う（公開から 2 日以上経った commit）。
+- APM では入れられない: APM 0.35.0 は Agent Plugins 形式（`.claude-plugin/plugin.json`）のパッケージを `copilot` 以外の
+  ターゲットに入れず、Skill を 1 つずつ入れる案しか出さない（agents が入らず、`/pstack:` の名前の対応も崩れる）。
+
+| プラグイン | 固定 | 内容 | 上流の状況（2026-11-13） |
+|---|---|---|---|
+| pstack | `cursor/plugins` `harness/pstack/claude-code` @ c742dd6（v0.15.36、2026-10-27、GitHub の署名検証 verified） | Skill 58 個・agents 2 個（`poteto-agent` / `comment-sicko`）。hooks・MCP サーバーは無し。MIT | このパスの最新 commit。上流はタグ無し（`plugin.json` の `version` のみ）。作者は Lauren Tan（poteto）、Cursor 公式リポジトリの生成物で、README が Claude Code 向けの導入手順（`/plugin install pstack@cursor-plugins`）を案内している |
+
 ## 既知の脆弱性（vulnix、2026-11-11）
 
 `vulnix` でシステムの閉包（system closure）を調べた結果、50 件の derivation が該当した。**採用したツール本体に、mise 側の版で修正済みの実在する CVE は無かった**ため、判定 3（CVE があれば mise）による変更は無い。

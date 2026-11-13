@@ -7,8 +7,9 @@ macOS ホストへのソフトウェア導入・更新では、**サプライチ
 
 - **Homebrew（formula / cask / nix-darwin の `homebrew` モジュール）と MacPorts は使わない。**
 - **検証なしの `curl | sh` は使わない。** 例外は Nix 本体の導入のみで、`tools/install-nix.sh`（版とハッシュを固定）を経由する。
-- **命令的なグローバル導入はしない**: `nix profile install` / `nix-env -i` / `npm -g` / `uv tool install` / `go install` / `/usr/local/bin` への直置き。
-  導入は必ず「宣言」（`flake.nix` 配下 / `mise/mise.toml`）に書く。宣言の外にあるものは「野良」として扱う。
+- **命令的なグローバル導入はしない**: `nix profile install` / `nix-env -i` / `npm -g` / `uv tool install` / `go install` / `/usr/local/bin` への直置き /
+  Claude Code の `/plugin install`・`claude plugin marketplace add <owner>/<repo>`。
+  導入は必ず「宣言」（`flake.nix` 配下 / `mise/mise.toml` / `skills/apm.yml` / `claude-plugins/`）に書く。宣言の外にあるものは「野良」として扱う。
 - **ホスト側で版を決めない**: `mise upgrade` / `mise use` / `nix flake update` / ツール自身の self-update をホストで実行しない。
   版の更新は GitHub 上の PR（Renovate / CI）でのみ行う。
   例外は `AUDIT.md`「例外」に載せたもの（公式が自己更新を前提とし、`tools/check.sh` が署名・Team ID・公証を毎回検証する）。

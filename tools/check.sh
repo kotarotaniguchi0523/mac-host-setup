@@ -9,6 +9,8 @@
 #   system   : the active nix-darwin generation was built from the current HEAD
 #   mise     : ~/.config/mise matches mise/ and every locked tool is installed
 #   skills   : ~/.apm matches skills/ and every file the APM lock deploys is present
+#   plugins  : every Claude Code plugin in claude-plugins/ is installed at its pinned commit and
+#              enabled, and no plugin from another marketplace is installed
 #   strays   : global installs outside the declarations (~/.local/bin, npm -g, uv tool, nix profile,
 #              Homebrew)
 #   op       : /usr/local/bin/op (nix-darwin programs._1password) is signed by AgileBits
@@ -61,6 +63,28 @@ if cmp -s "$repo/skills/apm.lock.yaml" "$HOME/.apm/apm.lock.yaml"; then
   [[ -n "$gone" ]] && add "skills: deployed files missing: $gone"
 else
   add "skills: ~/.apm/apm.lock.yaml differs from skills/apm.lock.yaml"
+fi
+
+# --- Claude Code plugins ----------------------------------------------------------------
+# Read from the files Claude Code writes (no claude run, so no network and no writes).
+mkt_json="$repo/claude-plugins/.claude-plugin/marketplace.json"
+cc_dir="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+installed="$cc_dir/plugins/installed_plugins.json"
+settings="$cc_dir/settings.json"
+if [[ -f "$mkt_json" ]]; then
+  mkt_name="$(jq -r .name "$mkt_json")"
+  [[ "$(jq -r --arg m "$mkt_name" '.extraKnownMarketplaces[$m].source.path // empty' "$settings" 2>/dev/null)" == "$repo/claude-plugins" ]] ||
+    add "plugins: marketplace $mkt_name is not registered from $repo/claude-plugins (run tools/update.sh)"
+  while IFS=$'\t' read -r p sha; do
+    id="$p@$mkt_name"
+    got="$(jq -r --arg id "$id" '.plugins[$id][]? | select(.scope == "user") | .gitCommitSha' "$installed" 2>/dev/null | head -n 1)"
+    if [[ -z "$got" ]]; then add "plugins: $id is not installed"
+    elif [[ "$got" != "$sha" ]]; then add "plugins: $id is at ${got:0:12}, declared ${sha:0:12}"; fi
+    [[ "$(jq -r --arg id "$id" '.enabledPlugins[$id] // false' "$settings" 2>/dev/null)" == "true" ]] ||
+      add "plugins: $id is not enabled"
+  done < <(jq -r '.plugins[] | [.name, .source.sha] | @tsv' "$mkt_json")
+  others="$(jq -r --arg m "$mkt_name" '.plugins // {} | keys[] | select(endswith("@" + $m) | not)' "$installed" 2>/dev/null | paste -sd' ' -)"
+  [[ -n "$others" ]] && add "stray: Claude Code plugins outside claude-plugins/: $others"
 fi
 
 # --- strays -----------------------------------------------------------------------------

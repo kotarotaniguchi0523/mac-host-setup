@@ -64,5 +64,9 @@ echo "[ok] mise tools installed (locked)"
 # skills/apm.yml + apm.lock.yaml -> ~/.apm, then a frozen install into ~/.claude/skills.
 "$repo/tools/skills-apply.sh"
 
-# --- 5. verify --------------------------------------------------------------------------
+# --- 5. Claude Code plugins ---------------------------------------------------------------
+# claude-plugins/ (local marketplace, each plugin pinned to a commit SHA) -> ~/.claude/plugins.
+"$repo/tools/plugins-apply.sh"
+
+# --- 6. verify --------------------------------------------------------------------------
 "$repo/tools/check.sh"

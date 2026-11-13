@@ -1,0 +1,21 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "mac-host-setup",
+  "description": "Claude Code plugins declared by mac-host-setup. Each plugin is pinned to a full commit SHA (tools/plugins-apply.sh installs them, tools/check.sh verifies the installed commit).",
+  "owner": {
+    "name": "mac-host-setup"
+  },
+  "plugins": [
+    {
+      "name": "pstack",
+      "description": "pstack (poteto) from cursor/plugins: the generated Claude Code tree harness/pstack/claude-code (v0.15.36, 2026-10-27)",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/cursor/plugins.git",
+        "path": "harness/pstack/claude-code",
+        "ref": "main",
+        "sha": "c742dd61706fbacc1b95f1a20b7b988cf096ce6c"
+      }
+    }
+  ]
+}
