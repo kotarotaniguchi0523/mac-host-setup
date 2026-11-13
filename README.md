@@ -14,6 +14,7 @@
 | `pkgs/` | 自前の Nix パッケージ（`mise-bin.nix`: mise の公式バイナリ。版と sha256 は `mise-bin.json`） |
 | `mise/mise.toml` / `mise/mise.lock` | mise のグローバル設定（`~/.config/mise/` へコピー） |
 | `skills/` | APM の Skills 宣言（`apm.yml` + `apm.lock.yaml`）。`tools/skills-apply.sh` が `~/.claude/skills/` へ配置 |
+| `claude-plugins/` | Claude Code プラグインの宣言（ローカルのマーケットプレイス、各プラグインを commit SHA で固定）。`tools/plugins-apply.sh` が導入 |
 | `tools/` | 導入・点検・適用・比較のスクリプト（共通処理は `tools/lib.sh`） |
 | `exceptions.tsv` | 自己更新を認めた導入物（名前・Developer ID の Team・置き場所）。`tools/check.sh` が毎回検証 |
 
