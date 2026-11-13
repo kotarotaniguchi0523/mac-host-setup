@@ -125,5 +125,6 @@ macOS ホストへのソフトウェア導入・更新では、**サプライチ
 ### lint・CI
 
 - 公開されている鍵の指紋などが betterleaks に検出されたら、意味の分かる変数名にして `# gitleaks:allow` を付ける。
+- pii チェックは CI では `$USER`（= `runner`）も個人情報として探す。コメントや文書に英単語の "runner" を書くと CI だけで落ちる（「CI machine」などと書く）。
 - shellcheck に `lib.sh` を追わせるには `# shellcheck source=tools/lib.sh` と `-x` を使う。
 - push 直後は `gh run list -c <sha>` が空や 404 を返すことがある。`gh run list -L 5` で run ID を確かめてから `gh run watch <id>` する。
