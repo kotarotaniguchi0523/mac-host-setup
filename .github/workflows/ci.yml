@@ -93,7 +93,7 @@ jobs:
       contents: read
     # Packages missing from cache.nixos.org are built here: the python315 set (not the default
     # Python, so Hydra does not cache it for darwin) is ~195 derivations on every run, mypy alone
-    # >30 min. 38 to 60+ minutes depending on the runner; 60 cancelled #4 and #5.
+    # >30 min. 38 to 60+ minutes depending on the CI machine; 60 cancelled #4 and #5.
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
