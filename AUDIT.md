@@ -31,6 +31,7 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | nushell | 0.116.1 | B | checksum（C） | **Nix** | |
 | betterleaks | 1.9.0 | B | checksum, cosign（A） | **Nix**（A vs B） | |
 | rtk | 1.1.0 | B | checksum（C） | **Nix** | |
+| apm（`apm-cli`） | 0.35.0 | B | github: checksum（C）。PyPI `apm-cli` は PEP 740 attestation 付きだが、uv / mise の導入時には検証されない（D） | **Nix** | Skills（`skills/apm.yml`）の配置に使う。CI も同じビルド（flake の `.#apm`）。最新 0.35.1 は公開 2 日未満（2026-11-12）。`apm self-update` / `apm update` は使わない（下記「Skills」） |
 | ghq | 1.12.0 | B | checksum（C、`aqua:x-motemen/ghq`、sha1） | **Nix** | 上流の最新と同じ版（v1.12.0、公開 2026-11-03、2026-11-12 時点で 9 日） |
 | pi | 1.5.0 (`pi-coding-agent`) | B | checksum（C） | **Nix** | 上流は同じ earendil-works/pi |
 | agent-browser | 0.41.1 | B（fromSource） | npm | **Nix** | |
@@ -62,7 +63,31 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | ghtkn | Windows の git credential helper。macOS は gh の期限付きトークン（`gh auth setup-git`）を使う |
 | openclaw | 使わない（ユーザー判断、2026-11-11）。参考: nixpkgs が insecure 指定（プロンプトインジェクション、既定でシステム全体にアクセス） |
 | ctx7 | 使わない（ユーザー判断、2026-11-12） |
-| apm / skillspector | Skills レーン（PLAN.md）で別途判定 |
+| skillspector | Skills レーンで別途判定（PLAN.md） |
+
+## Skills（`skills/apm.yml`、2026-11-12）
+
+APM（Nix の `apm-cli`）で `~/.claude/skills/` へ配置する（ターゲットは `claude` のみ。codex / opencode は当面配置しない）。
+依存はすべて commit SHA で固定し、`skills/apm.lock.yaml` が配置ファイルの sha256 まで記録する。
+
+- 適用: `tools/skills-apply.sh`（`tools/update.sh` から実行）。`apm install --global --frozen` → 配置漏れの確認 → `apm audit --ci`。
+- 更新: Renovate（apm manager）が `apm.yml` の SHA を更新 → `skills-relock.yml` が lock を再生成 → ci の `skills` ジョブが
+  cold な frozen install と `apm audit`（SARIF）を確認。
+- **`apm update` は使わない**: SHA 固定の依存の更新先として annotated tag だけを候補にし、現在の版との新旧を比べない
+  （`apm_cli/deps/revision_pins.py` `find_latest_annotated_tag`）。agent-browser（v0.41.2 → v0.22.3）、waza（v0.40.1 → v0.39.1）の
+  ように古い版へ戻す案が出る。0.35.0 / 0.35.1（Nix でソースからビルド）の両方で確認した。`apm outdated` も同じ判定で誤る。
+- yomiyasu の「hidden characters」警告は `scripts/*.py` の BOM（U+FEFF）除去処理に書かれた文字そのもの。`apm audit` は critical なし。
+- agent-desktop の Skill（`agent-desktop` / `agent-desktop-macos`）は CLI（mise `npm:agent-desktop`）と同じ v1.2.0 に揃える。
+
+| Skill | 固定 | 上流の状況（2026-11-12） |
+|---|---|---|
+| agent-browser | v0.41.2 | v0.42.0（11-10）・v0.43.0（11-12）。Renovate で更新 |
+| agent-desktop / agent-desktop-macos | v1.2.0 | v1.3.0（11-12、2 日未満） |
+| ax | v0.1.25 | 最新 |
+| yomiyasu | v2.5.0 | v3.0.0〜v3.1.0（major、11-10〜11-12）。Renovate で手動確認 |
+| nu_scripts（nushell） | main @ 1e6533e | main @ 7541123（11-12、2 日未満） |
+| explainer | main @ ccdd7ba | 変化なし |
+| waza / waza-interactive | v0.40.1 | 最新 |
 
 ## 既知の脆弱性（vulnix、2026-11-11）
 

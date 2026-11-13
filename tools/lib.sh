@@ -52,3 +52,19 @@ install_global_mise_config() {
 build_system() {
   nix build --no-link --print-out-paths --impure ".#darwinConfigurations.default.system"
 }
+
+# APM (Skills): the build pinned by flake.lock (.#apm = nixpkgs apm-cli), the same one the host has
+# on PATH. Resolved through the flake so CI and scripts started before activation use that version.
+apm_bin() {
+  local out
+  out="$(nix build --no-link --print-out-paths ".#apm")" || return 1
+  echo "$out/bin/apm"
+}
+
+# Run apm with <home> as HOME (user scope = <home>/.apm, Claude target = <home>/.claude/skills).
+# GITHUB_TOKEN (github_auth) is passed for this process only, against the GitHub API rate limit.
+apm_in() { # <home> <apm> <args...>
+  local h="$1" bin="$2"
+  shift 2
+  (cd "$h/.apm" && HOME="$h" GITHUB_APM_PAT="${GITHUB_TOKEN:-}" COLUMNS=200 "$bin" "$@")
+}

@@ -13,7 +13,7 @@
 | `home/` | ユーザー設定（Nix で入れる CLI、launchd の点検 agent） |
 | `pkgs/` | 自前の Nix パッケージ（`mise-bin.nix`: mise の公式バイナリ。版と sha256 は `mise-bin.json`） |
 | `mise/mise.toml` / `mise/mise.lock` | mise のグローバル設定（`~/.config/mise/` へコピー） |
-| `skills/` | APM の Skills 宣言（Windows 版と同じ） |
+| `skills/` | APM の Skills 宣言（`apm.yml` + `apm.lock.yaml`）。`tools/skills-apply.sh` が `~/.claude/skills/` へ配置 |
 | `tools/` | 導入・点検・適用・比較のスクリプト（共通処理は `tools/lib.sh`） |
 | `exceptions.tsv` | 自己更新を認めた導入物（名前・Developer ID の Team・置き場所）。`tools/check.sh` が毎回検証 |
 
@@ -24,7 +24,7 @@ git clone https://github.com/<you>/mac-host-setup.git ~/ghq/github.com/<you>/mac
 cd ~/ghq/github.com/<you>/mac-host-setup
 tools/install-nix.sh          # upstream Nix（版と installer の sha256 を固定して検証）。sudo を聞かれる
 # 新しいターミナルを開く
-tools/update.sh --bootstrap   # nix-darwin + home-manager を適用 → mise を locked で導入 → check
+tools/update.sh --bootstrap   # nix-darwin + home-manager を適用 → mise を locked で導入 → Skills を配置 → check
 mise trust . && mise install --locked && hk install   # このリポジトリ用のチェック（フック）
 ```
 
@@ -44,10 +44,11 @@ mise trust . && mise install --locked && hk install   # このリポジトリ用
 
 | ワークフロー | 内容 |
 |---|---|
-| `ci.yml` | push / PR で **lint**（hk: betterleaks / shellcheck / pii / jactionlint / pinact）・**mise-lock**（`tools/ci/mise-lock.sh --check`）・**nix**（macOS ランナーで `tools/install-nix.sh` → `tools/ci/nix-check.sh`: nixfmt / flake check / システム全体のビルド） |
+| `ci.yml` | push / PR で **skills**（`tools/ci/skills-lock.sh --check`: lock の一致・cold な frozen install・`apm audit`）・**lint**（hk: betterleaks / shellcheck / pii / jactionlint / pinact）・**mise-lock**（`tools/ci/mise-lock.sh --check`）・**nix**（macOS ランナーで `tools/install-nix.sh` → `tools/ci/nix-check.sh`: nixfmt / flake check / システム全体のビルド） |
 | `flake-lock.yml` | 週次。各 input を **2 日以上前の最新 commit** へ（`tools/ci/flake-lock-update.sh`）。ビルドしてから PR を作り、ci を起動。必須チェックが通れば自動マージ（auto-merge） |
 | `.github/actions/setup-mise` | CI の mise（`pkgs/mise-bin.json` の版 = ホストと同じ） |
 | `mise-bin.yml` | 週次。mise の公式リリース（2 日以上前の最新）を **GitHub attestation + GPG 署名**で検証して `pkgs/mise-bin.json` を更新し、lock も作り直して PR。必須チェックが通れば自動マージ |
+| `skills-relock.yml` | Renovate の PR で `skills/apm.lock.yaml` を再生成して push し、ci を起動 |
 | `mise-relock.yml` | Renovate の PR で mise の lock を再生成して push し、ci を起動（Mend の Renovate は `mise lock` を実行できない） |
 
 ## GitHub の設定（Windows 版と同等）

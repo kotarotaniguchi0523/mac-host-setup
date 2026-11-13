@@ -37,6 +37,9 @@
     betterleaks
     rtk
     ghq
+    # --- Skills (APM: skills/apm.yml -> ~/.claude/skills via tools/skills-apply.sh). Never run
+    #     `apm self-update` / `apm update`: versions change only through PRs (AUDIT.md).
+    apm-cli
     # --- Docker Sandboxes (sbx-setup builds and loads its templates from the host; the sandbox
     #     tools themselves live in the templates). Docker Desktop is an exception (exceptions.tsv).
     # The install check (`sbx version` run inside the build) makes macOS lock Sbx.app, and the store

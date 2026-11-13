@@ -1,0 +1,50 @@
+# Renovate (Mend hosted) cannot run apm, so its PRs that bump skills/apm.yml arrive without an
+# updated skills/apm.lock.yaml. This regenerates the lock on the PR branch with the pinned APM
+# (tools/ci/skills-lock.sh --write), then dispatches ci.yml there (pushes made with GITHUB_TOKEN do
+# not trigger workflows by themselves). Counterpart of mise-relock.yml.
+name: skills-relock
+
+on:
+  pull_request:
+    paths:
+      - skills/apm.yml
+
+permissions: {}
+
+concurrency:
+  group: skills-relock-${{ github.head_ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  relock:
+    name: relock
+    # Only branches of this repository (Renovate). Fork PRs never get a write token.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: macos-26
+    permissions:
+      contents: write # push the regenerated lock to the PR branch
+      actions: write # dispatch ci.yml on the PR branch
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+      HEAD_REF: ${{ github.head_ref }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: true # zizmor: artipacked -- needed to push to the PR branch
+      - name: install Nix (pinned + verified, same script as the host)
+        run: tools/install-nix.sh
+      - name: regenerate the lock
+        run: tools/ci/skills-lock.sh --write
+      - name: push if changed
+        run: |
+          if git diff --quiet -- skills/apm.lock.yaml; then
+            echo "[i] skills/apm.lock.yaml already up to date"; exit 0
+          fi
+          tools/ci/push-and-dispatch.sh "$HEAD_REF" "chore(deps): relock skills (APM)" skills/apm.lock.yaml

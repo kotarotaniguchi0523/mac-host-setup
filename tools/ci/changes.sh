@@ -15,6 +15,7 @@ base="${1:-}" head="${2:-HEAD}"
 # the setup-mise action) belongs to every area that uses it.
 shared='^(tools/lib\.sh|tools/ci/changes\.sh|\.github/workflows/ci\.yml)$'
 nix_re='(\.nix$|^flake\.lock$|^pkgs/|^tools/install-nix\.sh$|^tools/ci/nix-check\.sh$)'
+skills_re='(^skills/|^tools/skills-apply\.sh$|^tools/ci/skills-lock\.sh$|^flake\.(nix|lock)$)'
 mise_re='(^mise\.(toml|lock)$|^mise/|^pkgs/mise-bin\.json$|^tools/ci/mise-lock\.sh$|^\.github/actions/setup-mise/)'
 
 if [[ -z "$base" || "$base" =~ ^0+$ ]] || ! git cat-file -e "$base^{commit}" 2>/dev/null; then
@@ -27,3 +28,4 @@ out() { echo "$1=$2"; [[ -n "${GITHUB_OUTPUT:-}" ]] && echo "$1=$2" >> "$GITHUB_
 touches() { $all || grep -qE "$1|$shared" <<<"$files"; }
 touches "$nix_re" && out nix true || out nix false
 touches "$mise_re" && out mise true || out mise false
+touches "$skills_re" && out skills true || out skills false

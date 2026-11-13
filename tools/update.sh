@@ -60,5 +60,9 @@ mise_global prune --yes
 mise_global reshim
 echo "[ok] mise tools installed (locked)"
 
-# --- 4. verify --------------------------------------------------------------------------
+# --- 4. Skills (APM) ---------------------------------------------------------------------
+# skills/apm.yml + apm.lock.yaml -> ~/.apm, then a frozen install into ~/.claude/skills.
+"$repo/tools/skills-apply.sh"
+
+# --- 5. verify --------------------------------------------------------------------------
 "$repo/tools/check.sh"
