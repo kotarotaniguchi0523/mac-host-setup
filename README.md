@@ -44,7 +44,8 @@ mise trust . && mise install --locked && hk install   # このリポジトリ用
 
 | ワークフロー | 内容 |
 |---|---|
-| `ci.yml` | push / PR で **skills**（`tools/ci/skills-lock.sh --check`: lock の一致・cold な frozen install・`apm audit`）・**lint**（hk: betterleaks / shellcheck / pii / jactionlint / pinact）・**mise-lock**（`tools/ci/mise-lock.sh --check`）・**nix**（macOS ランナーで `tools/install-nix.sh` → `tools/ci/nix-check.sh`: nixfmt / flake check / システム全体のビルド） |
+| `ci.yml` | push / PR で **skills**（`tools/ci/skills-lock.sh --check`: lock の一致・cold な frozen install・`apm audit`）・**lint**（hk: betterleaks / shellcheck / pii / jactionlint / pinact）・**mise-lock**（`tools/ci/mise-lock.sh --check`）・**nix**（macOS で `tools/install-nix.sh` → `tools/ci/nix-check.sh`: nixfmt / flake check / システム全体の評価） |
+| `build.yml` | Nix の入力が変わる push / PR で**システム全体をビルド**（`tools/ci/nix-build.sh`）。必須チェックではない。cache.nixos.org に無いものは CI 専用の署名付きバイナリキャッシュ（Actions cache、鍵は `NIX_CACHE_SECRET_KEY`）に入れて次回から再利用 |
 | `flake-lock.yml` | 週次。各 input を **2 日以上前の最新 commit** へ（`tools/ci/flake-lock-update.sh`）。ビルドしてから PR を作り、ci を起動。必須チェックが通れば自動マージ（auto-merge） |
 | `.github/actions/setup-mise` | CI の mise（`pkgs/mise-bin.json` の版 = ホストと同じ） |
 | `mise-bin.yml` | 週次。mise の公式リリース（2 日以上前の最新）を **GitHub attestation + GPG 署名**で検証して `pkgs/mise-bin.json` を更新し、lock も作り直して PR。必須チェックが通れば自動マージ |
@@ -55,7 +56,7 @@ mise trust . && mise install --locked && hk install   # このリポジトリ用
 
 | 項目 | 設定 |
 |---|---|
-| `main` の保護 | 必須チェック `lint` / `mise-lock` / `nix`、linear history、force push・削除の禁止（管理者は直接 push 可） |
+| `main` の保護 | 必須チェック `lint` / `mise-lock` / `nix`（`build` は必須外）、linear history、force push・削除の禁止（管理者は直接 push 可） |
 | マージ | squash / rebase のみ（merge commit なし）、auto-merge 可、マージ後にブランチ削除 |
 | Actions | GitHub 製と `jdx/mise-action` のみ許可、**SHA 固定を必須**、workflow の既定権限は read |
 | セキュリティ | secret scanning + push protection、Dependabot アラート、private vulnerability reporting |
