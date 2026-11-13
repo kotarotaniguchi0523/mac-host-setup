@@ -31,6 +31,7 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | nushell | 0.116.1 | B | checksum（C） | **Nix** | |
 | betterleaks | 1.9.0 | B | checksum, cosign（A） | **Nix**（A vs B） | |
 | rtk | 1.1.0 | B | checksum（C） | **Nix** | |
+| ghq | 1.12.0 | B | checksum（C、`aqua:x-motemen/ghq`、sha1） | **Nix** | 上流の最新と同じ版（v1.12.0、公開 2026-11-03、2026-11-12 時点で 9 日） |
 | pi | 1.5.0 (`pi-coding-agent`) | B | checksum（C） | **Nix** | 上流は同じ earendil-works/pi |
 | agent-browser | 0.41.1 | B（fromSource） | npm | **Nix** | |
 | lefthook | 2.2.2 | B | checksum, github_attestations（A） | **Nix**（A vs B） | sbx-setup の Git hooks（ホストで動く）。上流の最新と同じ版（2026-11-12） |

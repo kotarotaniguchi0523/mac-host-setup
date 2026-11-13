@@ -36,6 +36,7 @@
     nushell
     betterleaks
     rtk
+    ghq
     # --- Docker Sandboxes (sbx-setup builds and loads its templates from the host; the sandbox
     #     tools themselves live in the templates). Docker Desktop is an exception (exceptions.tsv).
     # The install check (`sbx version` run inside the build) makes macOS lock Sbx.app, and the store
