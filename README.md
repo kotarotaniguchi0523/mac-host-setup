@@ -45,9 +45,9 @@ mise trust . && mise install --locked && hk install   # このリポジトリ用
 | ワークフロー | 内容 |
 |---|---|
 | `ci.yml` | push / PR で **lint**（hk: betterleaks / shellcheck / pii / jactionlint / pinact）・**mise-lock**（`tools/ci/mise-lock.sh --check`）・**nix**（macOS ランナーで `tools/install-nix.sh` → `tools/ci/nix-check.sh`: nixfmt / flake check / システム全体のビルド） |
-| `flake-lock.yml` | 週次。各 input を **2 日以上前の最新 commit** へ（`tools/ci/flake-lock-update.sh`）。ビルドしてから PR を作り、ci を起動 |
+| `flake-lock.yml` | 週次。各 input を **2 日以上前の最新 commit** へ（`tools/ci/flake-lock-update.sh`）。ビルドしてから PR を作り、ci を起動。必須チェックが通れば自動マージ（auto-merge） |
 | `.github/actions/setup-mise` | CI の mise（`pkgs/mise-bin.json` の版 = ホストと同じ） |
-| `mise-bin.yml` | 週次。mise の公式リリース（2 日以上前の最新）を **GitHub attestation + GPG 署名**で検証して `pkgs/mise-bin.json` を更新し、lock も作り直して PR |
+| `mise-bin.yml` | 週次。mise の公式リリース（2 日以上前の最新）を **GitHub attestation + GPG 署名**で検証して `pkgs/mise-bin.json` を更新し、lock も作り直して PR。必須チェックが通れば自動マージ |
 | `mise-relock.yml` | Renovate の PR で mise の lock を再生成して push し、ci を起動（Mend の Renovate は `mise lock` を実行できない） |
 
 ## GitHub の設定（Windows 版と同等）
