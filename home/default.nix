@@ -75,8 +75,28 @@
     # 1Password Shell Plugins (interactive shells): `op plugin init <tool>` (e.g. npm for the
     # Takumi Guard token) writes ~/.config/op/plugins.sh, which defines the wrapping aliases.
     # The file holds no secret (only plugin references); it is created on the host, not here.
+    # pip / uv have no 1Password Shell Plugin, so the same Takumi Guard token is passed the same way
+    # by hand: read from 1Password on every run and given to that one process as the index URL
+    # (https://token:<token>@pypi.flatt.tech/simple/, Takumi Guard's documented form). Nothing is
+    # written to pip.conf / uv.toml. Without a token (1Password locked, item missing) the command
+    # still runs through the proxy anonymously (mise/mise.toml [env]) and says so on stderr.
+    # Interactive shells only, like the plugins; `python -m pip` and scripts are not wrapped.
     initContent = ''
       [[ -f "$HOME/.config/op/plugins.sh" ]] && source "$HOME/.config/op/plugins.sh"
+      : ''${TAKUMI_GUARD_TOKEN_REF:="op://Employee/Takumi guard/token"}
+      _takumi_guard_pypi() {
+        local cmd=$1 tok url
+        shift
+        if tok=$(op read --no-newline "$TAKUMI_GUARD_TOKEN_REF" 2>/dev/null) && [[ -n $tok ]]; then
+          url="https://token:''${tok}@pypi.flatt.tech/simple/"
+          PIP_INDEX_URL=$url UV_INDEX_URL=$url UV_DEFAULT_INDEX=$url command "$cmd" "$@"
+        else
+          print -u2 "takumi-guard: no token from 1Password ($TAKUMI_GUARD_TOKEN_REF); $cmd runs without it"
+          command "$cmd" "$@"
+        fi
+      }
+      for _c in pip pip3 uv uvx; do eval "$_c() { _takumi_guard_pypi $_c \"\$@\"; }"; done
+      unset _c
     '';
   };
 
