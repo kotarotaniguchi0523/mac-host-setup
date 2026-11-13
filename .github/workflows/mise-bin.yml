@@ -56,3 +56,6 @@ jobs:
             gh pr create --head "$BRANCH" --base main --title "chore(deps): update mise to $version" \
               --body "Official release binary, verified with its GitHub attestation and the GPG-signed SHASUMS256 before pinning (tools/ci/mise-bin-update.sh). ci.yml builds the host with it on this branch."
           fi
+          # Merge as soon as the required checks (lint / mise-lock / nix) pass, like Renovate's
+          # minor / patch updates. A merge made with GITHUB_TOKEN starts no push workflows on main.
+          gh pr merge "$BRANCH" --squash --auto

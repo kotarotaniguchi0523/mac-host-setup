@@ -47,3 +47,6 @@ jobs:
             gh pr create --head "$BRANCH" --base main --title "chore(deps): update flake.lock" \
               --body "Inputs moved to their newest commits that are at least 2 days old (tools/ci/flake-lock-update.sh). ci.yml builds the system on this branch."
           fi
+          # Merge as soon as the required checks (lint / mise-lock / nix) pass, like Renovate's
+          # minor / patch updates. A merge made with GITHUB_TOKEN starts no push workflows on main.
+          gh pr merge "$BRANCH" --squash --auto
