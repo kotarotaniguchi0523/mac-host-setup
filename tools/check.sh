@@ -8,6 +8,7 @@
 #   remote   : origin/main has commits this checkout has not applied yet
 #   system   : the active nix-darwin generation was built from the current HEAD
 #   mise     : ~/.config/mise matches mise/ and every locked tool is installed
+#   skills   : ~/.apm matches skills/ and every file the APM lock deploys is present
 #   strays   : global installs outside the declarations (~/.local/bin, npm -g, uv tool, nix profile)
 #   exception: approved self-updating installs (exceptions.tsv) are still at their expected path and
 #              signed with a Developer ID of the expected team (instead of being reported as strays)
@@ -47,6 +48,17 @@ if command -v mise >/dev/null 2>&1; then
   [[ -n "$missing" ]] && add "mise: not installed: $missing"
 else
   add "mise: not found"
+fi
+
+# --- skills (APM) ----------------------------------------------------------------------
+# Compared with the files only (no apm run, so no network and no writes).
+cmp -s "$repo/skills/apm.yml" "$HOME/.apm/apm.yml" || add "skills: ~/.apm/apm.yml differs from skills/apm.yml"
+if cmp -s "$repo/skills/apm.lock.yaml" "$HOME/.apm/apm.lock.yaml"; then
+  gone="$(awk '/^  deployed_files:/{f=1; next} /^  [a-z_]+:/{f=0} f && /^  - /{print $2}' "$HOME/.apm/apm.lock.yaml" |
+    while IFS= read -r p; do [[ -e "$HOME/$p" ]] || echo "$p"; done | head -n 5 | paste -sd' ' -)"
+  [[ -n "$gone" ]] && add "skills: deployed files missing: $gone"
+else
+  add "skills: ~/.apm/apm.lock.yaml differs from skills/apm.lock.yaml"
 fi
 
 # --- strays -----------------------------------------------------------------------------

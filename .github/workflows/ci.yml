@@ -5,6 +5,8 @@
 #  - lint     : hk pre-commit steps on all files (betterleaks / shellcheck / pii / jactionlint / pinact)
 #               -- always (cheap, and pii / secrets must see every change)
 #  - mise-lock: mise lockfiles are complete and up to date (global lane + dev tools)
+#  - skills   : skills/apm.lock.yaml matches apm.yml, a cold frozen install deploys it, apm audit
+#               (SARIF to code scanning). APM is the flake's .#apm, the same build as the host.
 #  - nix      : install Nix with tools/install-nix.sh, nixfmt, flake check, build the full system
 name: ci
 
@@ -36,6 +38,7 @@ jobs:
     outputs:
       nix: ${{ steps.diff.outputs.nix }}
       mise: ${{ steps.diff.outputs.mise }}
+      skills: ${{ steps.diff.outputs.skills }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -83,6 +86,33 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }} # GitHub API rate limit for release lookups
         run: tools/ci/mise-lock.sh --check
+
+  skills:
+    name: skills
+    needs: changes
+    if: needs.changes.outputs.skills == 'true'
+    runs-on: macos-26
+    permissions:
+      contents: read
+      security-events: write # apm audit SARIF -> code scanning
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: install Nix (pinned + verified, same script as the host)
+        run: tools/install-nix.sh
+      - name: lock / frozen install / audit
+        env:
+          GITHUB_TOKEN: ${{ github.token }} # GitHub API rate limit for APM's ref lookups
+        run: tools/ci/skills-lock.sh --check apm-audit.sarif
+      - name: SARIF to code scanning
+        if: always() && hashFiles('apm-audit.sarif') != ''
+        continue-on-error: true # a transient upload error must not fail the check
+        uses: github/codeql-action/upload-sarif@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          sarif_file: apm-audit.sarif
+          category: apm-audit
 
   nix:
     name: nix

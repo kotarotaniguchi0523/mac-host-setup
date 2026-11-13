@@ -119,6 +119,12 @@ macOS ホストへのソフトウェア導入・更新では、**サプライチ
 - **paranoid の mise は pnpm を拒否する。** npm バックエンドは `aube` を使い、依存グラフ `mise/locks/` も lock と一緒に commit する（ホスト専用ではない）。
 - github バックエンドで asset 名がプラットフォームごとに違うものは、プラットフォーム別の `asset_pattern` を書く（1 つのテンプレートだと別プラットフォームの lock に macOS の URL が入った）。
 
+### APM（Skills）
+
+- **`apm update` / `apm outdated` の結果で版を決めない。** SHA 固定の依存では annotated tag だけを見て、古い版を「最新」と出す（AUDIT.md「Skills」）。
+  版の更新は Renovate の PR、lock の再生成は `tools/ci/skills-lock.sh --write`（`skills-relock.yml`）。上流の新しい版は GitHub のタグと公開日で確かめる。
+- apm を試すときは一時 HOME で動かす（`tools/lib.sh` の `apm_in <home> <apm> ...`）。ホストの `~/.apm` / `~/.claude/skills` は `tools/skills-apply.sh` だけが書く。
+
 ### lint・CI
 
 - 公開されている鍵の指紋などが betterleaks に検出されたら、意味の分かる変数名にして `# gitleaks:allow` を付ける。

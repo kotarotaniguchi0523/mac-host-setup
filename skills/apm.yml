@@ -1,19 +1,22 @@
-name: win-host-setup
+name: mac-host-setup
 version: 1.0.0
 description: Global Skills / APM packages used on this host (verification-focused, version-pinned)
 
 # Deploy targets, declared explicitly so the resolution does not depend on per-machine
 # auto-detection (see docs: targets matrix):
-#   codex    -> ~/.agents/skills/<name>/
-#   opencode -> ~/.config/opencode/skills/<name>/
+#   claude -> ~/.claude/skills/<name>/   (Claude Code)
+# codex / opencode are left out for now.
 targets:
-  - codex
-  - opencode
+  - claude
 
 dependencies:
   apm:
     # Browser automation / web fetching
     - vercel-labs/agent-browser#d52a5e90c372ec4710c69adc3837ac14bbd852aa # v0.41.2
+    # Desktop automation (agent-desktop). Same version as the CLI in mise/mise.toml. The CLI also
+    # embeds these (`agent-desktop skills get`); declared here so the agent sees them as Skills.
+    - vercel-labs/agent-desktop/skills/agent-desktop#2b0a7334fc111730454b726e6800aa41cdafc093 # v1.2.0
+    - vercel-labs/agent-desktop/skills/agent-desktop-macos#2b0a7334fc111730454b726e6800aa41cdafc093 # v1.2.0
     - yusukebe/ax#0ddd8a748ae2401ae344f536f6e8dded890fcdbf # v0.1.25
     # Japanese proofreading (rewrite AI-generated Japanese into natural Japanese)
     - nanaism/yomiyasu#29d67ccb05e370b5958d72920a9cd1aa829dee80 # v2.5.0

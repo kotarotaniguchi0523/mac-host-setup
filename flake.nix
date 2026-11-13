@@ -63,5 +63,8 @@
         };
 
       formatter.${system} = nixpkgs.legacyPackages.${system}.nixfmt;
+
+      # APM (Skills) for tools/skills-apply.sh and CI: the same build as the one on the host PATH.
+      packages.${system}.apm = nixpkgs.legacyPackages.${system}.apm-cli;
     };
 }
