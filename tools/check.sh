@@ -9,7 +9,9 @@
 #   system   : the active nix-darwin generation was built from the current HEAD
 #   mise     : ~/.config/mise matches mise/ and every locked tool is installed
 #   skills   : ~/.apm matches skills/ and every file the APM lock deploys is present
-#   strays   : global installs outside the declarations (~/.local/bin, npm -g, uv tool, nix profile)
+#   strays   : global installs outside the declarations (~/.local/bin, npm -g, uv tool, nix profile,
+#              Homebrew)
+#   op       : /usr/local/bin/op (nix-darwin programs._1password) is signed by AgileBits
 #   exception: approved self-updating installs (exceptions.tsv) are still at their expected path and
 #              signed with a Developer ID of the expected team (instead of being reported as strays)
 # Writes .agent/update-report.json. Exit 0 = clean, 5 = needs attention.
@@ -102,6 +104,15 @@ if sbx="$(command -v sbx)"; then
   sbx_app="$(realpath "$sbx")"; sbx_app="${sbx_app%/Contents/MacOS/sbx}"
   signed_by "$sbx_app" 9BNSXJN65R || add "sbx: $sbx_app is not signed with Docker's Developer ID (team 9BNSXJN65R)"
 fi
+# 1Password CLI: nix-darwin copies it to /usr/local/bin/op (the app integration needs that path).
+# Not in cache.nixos.org (unfree), so the vendor's signature is checked here as well.
+if [[ -e /usr/local/bin/op ]]; then
+  signed_by /usr/local/bin/op 2BUA8C4S2C || add "op: /usr/local/bin/op is not signed with AgileBits' Developer ID (team 2BUA8C4S2C)"
+fi
+# Homebrew is forbidden (AGENTS.md); an installer run leaves these behind even with nothing installed.
+for p in /opt/homebrew /usr/local/Homebrew /etc/paths.d/homebrew; do
+  [[ -e "$p" ]] && add "stray: Homebrew at $p"
+done
 if command -v npm >/dev/null 2>&1; then
   npm_g="$(npm ls -g --depth=0 --parseable 2>/dev/null | tail -n +2 | xargs -n1 basename 2>/dev/null | grep -vE '^(npm|corepack)$' | paste -sd' ' -)"
   [[ -n "$npm_g" ]] && add "stray: npm -g has $npm_g"
