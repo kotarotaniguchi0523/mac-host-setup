@@ -1,0 +1,77 @@
+# Full build of the nix-darwin system (what tools/update.sh activates), kept out of the required
+# checks: packages missing from cache.nixos.org (the python315 set, ~195 derivations) made it take
+# 40 to 60+ minutes. The required `nix` job in ci.yml only formats, checks and evaluates.
+#
+# What a run builds itself is kept as a signed binary cache in the Actions cache (restore and save
+# as separate steps, so a failed or timed-out build still saves its progress), and the next run
+# substitutes it. The cache key is the hash of the Nix inputs; restore-keys falls back to the
+# newest older cache, and the new entry is that cache plus what this run built.
+# The host never uses this cache: its substituter stays cache.nixos.org only (AGENTS.md).
+name: build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**.nix"
+      - flake.lock
+      - pkgs/**
+      - tools/install-nix.sh
+      - tools/lib.sh
+      - tools/ci/nix-build.sh
+      - .github/workflows/build.yml
+  pull_request:
+    paths:
+      - "**.nix"
+      - flake.lock
+      - pkgs/**
+      - tools/install-nix.sh
+      - tools/lib.sh
+      - tools/ci/nix-build.sh
+      - .github/workflows/build.yml
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: build-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: build
+    runs-on: macos-26
+    permissions:
+      contents: read
+    timeout-minutes: 180
+    env:
+      # Public half of the signing key in the NIX_CACHE_SECRET_KEY secret (CI only).
+      NIX_CACHE_PUBLIC_KEY: mac-host-setup-ci-1:YtnUCa7rGPyeQFRMVDMIStzVArE8FnwWbxMQEL6hl10= # gitleaks:allow
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: install Nix (pinned + verified, same script as the host)
+        run: tools/install-nix.sh
+      - name: restore the binary cache
+        id: cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/nix-cache
+          key: nix-cache-macos-arm64-${{ hashFiles('flake.lock', '**/*.nix', 'pkgs/**') }}
+          restore-keys: |
+            nix-cache-macos-arm64-
+      - name: build the system
+        env:
+          NIX_CACHE_SECRET_KEY: ${{ secrets.NIX_CACHE_SECRET_KEY }}
+        run: tools/ci/nix-build.sh "$HOME/nix-cache"
+      - name: save the binary cache
+        if: always() && steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/nix-cache
+          key: ${{ steps.cache.outputs.cache-primary-key }}

@@ -7,7 +7,8 @@
 #  - mise-lock: mise lockfiles are complete and up to date (global lane + dev tools)
 #  - skills   : skills/apm.lock.yaml matches apm.yml, a cold frozen install deploys it, apm audit
 #               (SARIF to code scanning). APM is the flake's .#apm, the same build as the host.
-#  - nix      : install Nix with tools/install-nix.sh, nixfmt, flake check, build the full system
+#  - nix      : install Nix with tools/install-nix.sh, nixfmt, flake check, evaluate the system
+#               (the full build is build.yml: not required, with a binary cache)
 name: ci
 
 on:
@@ -121,15 +122,14 @@ jobs:
     runs-on: macos-26
     permissions:
       contents: read
-    # Packages missing from cache.nixos.org are built here: the python315 set (not the default
-    # Python, so Hydra does not cache it for darwin) is ~195 derivations on every run, mypy alone
-    # >30 min. 38 to 60+ minutes depending on the CI machine; 60 cancelled #4 and #5.
-    timeout-minutes: 120
+    # Format, flake check and evaluation only. The full build (40 to 60+ minutes when
+    # cache.nixos.org lacks packages) is build.yml, with a binary cache and outside the required checks.
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: install Nix (pinned + verified, same script as the host)
         run: tools/install-nix.sh
-      - name: nixfmt / flake check / build
+      - name: nixfmt / flake check / evaluate
         run: tools/ci/nix-check.sh

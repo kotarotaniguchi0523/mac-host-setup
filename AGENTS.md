@@ -112,6 +112,9 @@ macOS ホストへのソフトウェア導入・更新では、**サプライチ
 
 - **`nix fmt` は必ずファイルを指定する**（`nix fmt -- <files>`）。引数なしだと nixfmt が標準入力を待って止まる。
 - `nix eval --raw` の出力には末尾の改行が無い。`read` で受けるなら `; echo` を足す。
+- **CI のシステム全体のビルドは `build.yml`（必須チェックではない）。** cache.nixos.org に無いもの（python315 の一式など）のビルドで
+  60 分を超え、必須チェックが止まった。必須の `nix` ジョブは評価まで。`build.yml` は自分でビルドしたものを CI 専用の署名付き
+  キャッシュ（Actions cache）に入れる。ホストの substituter には加えない。
 - **ビルド中に `.app` を実行するパッケージ（`versionCheckHook` など）は macOS で失敗することがある**
   （`clearing flags of path …/X.app: Operation not permitted`）。`overrideAttrs { doInstallCheck = false; }` にして、
   代わりに `tools/check.sh` で署名（Team ID）を確認する（`docker-sbx` の例）。
