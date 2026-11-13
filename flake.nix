@@ -32,8 +32,17 @@
       # Fail loudly instead of building for user "" (e.g. evaluated without --impure, or under sudo -i).
       checked =
         assert user != "" && user != "root" && home != "";
+        assert builtins.pathExists "${repoDir}/flake.nix";
         true;
-      repoDir = "${home}/src/mac-host-setup";
+      # Where this checkout lives (repositories are managed by ghq, so the path is not fixed).
+      # tools/lib.sh exports it; plain `nix` commands run from the repository root fall back to PWD.
+      # The launchd check agent runs tools/check.sh from here, so after moving the checkout,
+      # run tools/update.sh from the new place once.
+      repoDir =
+        let
+          dir = builtins.getEnv "MAC_HOST_SETUP_DIR";
+        in
+        if dir != "" then dir else builtins.getEnv "PWD";
     in
     {
       darwinConfigurations.default =

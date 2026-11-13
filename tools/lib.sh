@@ -4,6 +4,8 @@
 # shellcheck shell=bash
 
 repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# The checkout's location for the flake (repoDir): repositories live under ghq, not a fixed path.
+export MAC_HOST_SETUP_DIR="$repo"
 
 die() { echo "error: $1" >&2; exit "${2:-1}"; }
 
