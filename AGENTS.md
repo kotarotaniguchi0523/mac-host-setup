@@ -103,6 +103,9 @@ macOS ホストへのソフトウェア導入・更新では、**サプライチ
 - **zsh を通らないプロセス（GUI アプリとして起動した AI エージェント、そこから起動される bash / sh）は launchd の PATH を使う。**
   `home/launchd.nix` の `session-path` がログインのたびに `launchctl setenv PATH` で設定する。PATH の並びを変えるときは `.zshenv` とこちらの両方を直す。
 - **home-manager は既存の dotfile を置き換える。** 既存の内容（PATH など）を移さずに管理下へ入れない。退避は `backupFileExtension`。
+- **リポジトリは ghq 配下（`~/ghq/github.com/<owner>/<repo>`）に置く。** このリポジトリの場所は固定しない（`tools/lib.sh` が `MAC_HOST_SETUP_DIR` を渡し、flake の `repoDir` になる）。
+  移動した後は、新しい場所から `tools/update.sh` を 1 回実行して launchd の点検 agent のパスを更新する。
+- **`tools/lib.sh` を手で読み込むときは bash で。** zsh で `. tools/lib.sh` すると `BASH_SOURCE` が空になり、`$repo` が親ディレクトリになる（`bash -c '. tools/lib.sh && ...'`）。
 - sudo が必要な `tools/update.sh` / `tools/install-nix.sh` は TTY が要るので、ユーザーが Terminal.app で実行する。
 
 ### Nix

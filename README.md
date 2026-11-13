@@ -20,8 +20,8 @@
 ## 初回セットアップ
 
 ```sh
-git clone https://github.com/<you>/mac-host-setup.git ~/src/mac-host-setup
-cd ~/src/mac-host-setup
+git clone https://github.com/<you>/mac-host-setup.git ~/ghq/github.com/<you>/mac-host-setup   # ghq の配置（ghq が入った後は ghq get）
+cd ~/ghq/github.com/<you>/mac-host-setup
 tools/install-nix.sh          # upstream Nix（版と installer の sha256 を固定して検証）。sudo を聞かれる
 # 新しいターミナルを開く
 tools/update.sh --bootstrap   # nix-darwin + home-manager を適用 → mise を locked で導入 → check

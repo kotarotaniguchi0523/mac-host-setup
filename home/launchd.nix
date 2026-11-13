@@ -1,4 +1,5 @@
 {
+  lib,
   home,
   user,
   repoDir,
@@ -52,7 +53,7 @@ in
       ProgramArguments = [
         "/bin/zsh"
         "-lc"
-        "${repoDir}/tools/check.sh --notify"
+        "${lib.escapeShellArg "${repoDir}/tools/check.sh"} --notify"
       ];
       StartCalendarInterval = [
         {
