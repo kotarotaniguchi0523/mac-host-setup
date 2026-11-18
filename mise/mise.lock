@@ -3,100 +3,100 @@
 lockfile_version = 3
 
 [[tools."aqua:k1LoW/mo"]]
-version = "1.7.0"
+version = "1.8.0"
 backend = "aqua:k1LoW/mo"
-specifiers = ["1.7.0"]
+specifiers = ["1.8.0"]
 
 [tools."aqua:k1LoW/mo"."platforms.linux-x64"]
-checksum = "sha256:6760e48a24a406915d396ba1d13dd7d5650eea52156f40a8cd075da14b864ab3"
+checksum = "sha256:d5c19224248756bd6948d1f549c876bf5f6540ae3d74bf4799cb12d87a5f8f4b"
 checksum_source = "mise-versions"
-url = "https://github.com/k1LoW/mo/releases/download/v1.7.0/mo_v1.7.0_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/k1LoW/mo/releases/assets/662490660"
+url = "https://github.com/k1LoW/mo/releases/download/v1.8.0/mo_v1.8.0_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/k1LoW/mo/releases/assets/730258451"
 
 [tools."aqua:k1LoW/mo"."platforms.macos-arm64"]
-checksum = "sha256:0787226aa3ff99cc85c483f512c29afd889359276ca10841b3a147c9969b3746"
+checksum = "sha256:e533b07109a6dc7cf2be5ce16e1bbc3b5fb6891efeacd951b2b17bda4aa80028"
 checksum_source = "mise-versions"
-url = "https://github.com/k1LoW/mo/releases/download/v1.7.0/mo_v1.7.0_darwin_arm64.zip"
-url_api = "https://api.github.com/repos/k1LoW/mo/releases/assets/662490656"
+url = "https://github.com/k1LoW/mo/releases/download/v1.8.0/mo_v1.8.0_darwin_arm64.zip"
+url_api = "https://api.github.com/repos/k1LoW/mo/releases/assets/730258445"
 
 [[tools."aqua:microsoft/tgrep"]]
-version = "1.2.4"
+version = "1.2.7"
 backend = "aqua:microsoft/tgrep"
-specifiers = ["1.2.4"]
+specifiers = ["1.2.7"]
 
 [tools."aqua:microsoft/tgrep"."platforms.linux-x64"]
-checksum = "sha256:8f1fbdcefcfd1664bf495109db16c75d2eee2a6517fe14813a6b3acfff17d870"
+checksum = "sha256:956a561524fcf9c5cc7631b99218b4d6f2e9845aae51a698aee275fdc23fd6a0"
 checksum_source = "mise-versions"
-url = "https://github.com/microsoft/tgrep/releases/download/v1.2.4/tgrep-v1.2.4-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/microsoft/tgrep/releases/assets/660041068"
+url = "https://github.com/microsoft/tgrep/releases/download/v1.2.7/tgrep-v1.2.7-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/microsoft/tgrep/releases/assets/707732392"
 
 [tools."aqua:microsoft/tgrep"."platforms.macos-arm64"]
-checksum = "sha256:ddd97c3a824ef42f6ed77584321a8982fde79190581bc5af6b6b50ddb3f40415"
+checksum = "sha256:9d98ea852d9fe61930afe036e93225d3284dbd9f555f9f2fcbefaf69af9f639b"
 checksum_source = "mise-versions"
-url = "https://github.com/microsoft/tgrep/releases/download/v1.2.4/tgrep-v1.2.4-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/microsoft/tgrep/releases/assets/660041073"
+url = "https://github.com/microsoft/tgrep/releases/download/v1.2.7/tgrep-v1.2.7-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/microsoft/tgrep/releases/assets/707732393"
 
 [[tools."github:h4ckf0r0day/obscura"]]
-version = "0.2.6"
+version = "0.2.7"
 backend = "github:h4ckf0r0day/obscura"
-specifiers = ["v0.2.6"]
+specifiers = ["v0.2.7"]
 
 [tools."github:h4ckf0r0day/obscura".options]
 asset_pattern = "obscura-x86_64-linux.tar.gz"
 
 [tools."github:h4ckf0r0day/obscura"."platforms.linux-x64"]
-checksum = "sha256:eed986e478c5ec5439f531f2d7fb6b0e36a356f1df7a6c44a8e8fd4f2486bd76"
+checksum = "sha256:11b53d27cd743e00e196e216920e7f3f794cf378e3f1792b8d25d3beabaf9cad"
 checksum_source = "mise-versions"
-url = "https://github.com/h4ckf0r0day/obscura/releases/download/v0.2.6/obscura-x86_64-linux.tar.gz"
-url_api = "https://api.github.com/repos/h4ckf0r0day/obscura/releases/assets/696469085"
+url = "https://github.com/h4ckf0r0day/obscura/releases/download/v0.2.7/obscura-x86_64-linux.tar.gz"
+url_api = "https://api.github.com/repos/h4ckf0r0day/obscura/releases/assets/745456994"
 
 [[tools."github:h4ckf0r0day/obscura"]]
-version = "0.2.6"
+version = "0.2.7"
 backend = "github:h4ckf0r0day/obscura"
-specifiers = ["v0.2.6"]
+specifiers = ["v0.2.7"]
 
 [tools."github:h4ckf0r0day/obscura".options]
 asset_pattern = "obscura-aarch64-macos.tar.gz"
 
 [tools."github:h4ckf0r0day/obscura"."platforms.macos-arm64"]
-checksum = "sha256:19faa248ac762f466ddb822dbb03ed4f097312d10d1a4d5b2143e6040a9bebd0"
+checksum = "sha256:fc7e73f23058f18d6d5be983d83b24ba374d12167677657a307a9476c0f5a7c1"
 checksum_source = "mise-versions"
-url = "https://github.com/h4ckf0r0day/obscura/releases/download/v0.2.6/obscura-aarch64-macos.tar.gz"
-url_api = "https://api.github.com/repos/h4ckf0r0day/obscura/releases/assets/696469088"
+url = "https://github.com/h4ckf0r0day/obscura/releases/download/v0.2.7/obscura-aarch64-macos.tar.gz"
+url_api = "https://api.github.com/repos/h4ckf0r0day/obscura/releases/assets/745456999"
 
 [[tools."github:init-co-jp/diff-tour"]]
-version = "0.6.0"
+version = "0.6.1"
 backend = "github:init-co-jp/diff-tour"
-specifiers = ["v0.6.0"]
+specifiers = ["v0.6.1"]
 
 [tools."github:init-co-jp/diff-tour"."platforms.linux-x64"]
-checksum = "sha256:36be30a6cbfb7cdc84c22a6c568c2baa548685f77243cdd84a4a0e2788d49241"
+checksum = "sha256:629460b8fe3f9b4418ea6b61c1b3742736e0ab6d4fb5ce917e1329f40814ce28"
 checksum_source = "mise-versions"
-url = "https://github.com/init-co-jp/diff-tour/releases/download/v0.6.0/diff-tour_0.6.0_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/init-co-jp/diff-tour/releases/assets/671599367"
+url = "https://github.com/init-co-jp/diff-tour/releases/download/v0.6.1/diff-tour_0.6.1_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/init-co-jp/diff-tour/releases/assets/687695286"
 
 [tools."github:init-co-jp/diff-tour"."platforms.macos-arm64"]
-checksum = "sha256:3d69eaa0ca8bc085ffe945938369b8978883cd5c93a616ee7de53716aac8baa4"
+checksum = "sha256:8f51069aa844ecf9afd83958c0e099bcb2664d449078b3cbcab5c1b66860e173"
 checksum_source = "mise-versions"
-url = "https://github.com/init-co-jp/diff-tour/releases/download/v0.6.0/diff-tour_0.6.0_darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/init-co-jp/diff-tour/releases/assets/671599323"
+url = "https://github.com/init-co-jp/diff-tour/releases/download/v0.6.1/diff-tour_0.6.1_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/init-co-jp/diff-tour/releases/assets/687695277"
 
 [[tools."github:microsoft/waza"]]
-version = "0.39.0"
+version = "0.41.0"
 backend = "github:microsoft/waza"
-specifiers = ["v0.39.0"]
+specifiers = ["v0.41.0"]
 
 [tools."github:microsoft/waza"."platforms.linux-x64"]
-checksum = "sha256:a80138c3d37d48e947ef5b414a1ba4657935b7334d2cebe47cf71d004680f250"
+checksum = "sha256:9c7397d8d28127d7c99ec6ad1fab730cbd438174a3960afbc82c3a60dacccb74"
 checksum_source = "mise-versions"
-url = "https://github.com/microsoft/waza/releases/download/v0.39.0/waza-linux-amd64"
-url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/660184389"
+url = "https://github.com/microsoft/waza/releases/download/v0.41.0/waza-linux-amd64"
+url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/743492545"
 
 [tools."github:microsoft/waza"."platforms.macos-arm64"]
-checksum = "sha256:f4732e350a61e22f440ddfe7fcedc2e781661fd7c039cf3005af90bab5d52c0f"
+checksum = "sha256:8ea238f6d539c23a6116cd59710075f341ffb305c5674c34cb4e7998d3459abd"
 checksum_source = "mise-versions"
-url = "https://github.com/microsoft/waza/releases/download/v0.39.0/waza-darwin-arm64"
-url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/660184384"
+url = "https://github.com/microsoft/waza/releases/download/v0.41.0/waza-darwin-arm64"
+url_api = "https://api.github.com/repos/microsoft/waza/releases/assets/743492489"
 
 [[tools."github:yusukebe/ax"]]
 version = "0.1.25"
@@ -116,45 +116,45 @@ url = "https://github.com/yusukebe/ax/releases/download/v0.1.25/ax-darwin-arm64"
 url_api = "https://api.github.com/repos/yusukebe/ax/releases/assets/502198739"
 
 [[tools."npm:agent-desktop"]]
-version = "1.2.0"
-aube = { path = "locks/npm-agent-desktop/1.2.0~785137e1", digest = "sha256:79288f7bdffc6b7acfab1a66c99c97e790712114cc55546b53d6476ad51eec84" }
+version = "1.3.1"
+aube = { path = "locks/npm-agent-desktop/1.3.1~785137e1", digest = "sha256:0cf27fde93a0083769f8496013f0a5f911c14a0fbce2e67fff4681a0c5dbc3ae" }
 backend = "npm:agent-desktop"
-specifiers = ["1.2.0"]
+specifiers = ["1.3.1"]
 
 [tools."npm:agent-desktop".options]
 allow_builds = '["agent-desktop"]'
 
 [[tools."npm:secretlint"]]
-version = "13.0.7"
-aube = { path = "locks/npm-secretlint/13.0.7", digest = "sha256:ec0a52c4389e93d328bda3e74b46c36e2cc21e7fc8d031d246532b35d8581be7" }
+version = "14.0.0"
+aube = { path = "locks/npm-secretlint/14.0.0", digest = "sha256:95636b026fcb3c879f43fca027e86e1429b4a0555b37a85e401ebeee9ba32cbf" }
 backend = "npm:secretlint"
-specifiers = ["13.0.7"]
+specifiers = ["14.0.0"]
 
 [[tools."npm:t3"]]
-version = "0.1.8"
-aube = { path = "locks/npm-t3/0.1.8", digest = "sha256:b5215f8f4b727dab9a7218680ccebcf3e2b87c78750876b9d10ef1d5ffa03ab6" }
+version = "0.1.9"
+aube = { path = "locks/npm-t3/0.1.9", digest = "sha256:3cff4430f59358aa37fbc0672e95882c5f63ee73d92fa39ec8bd0eb7d240fad3" }
 backend = "npm:t3"
-specifiers = ["0.1.8"]
+specifiers = ["0.1.9"]
 
 [[tools."npm:textlint"]]
-version = "15.8.0"
-aube = { path = "locks/npm-textlint/15.8.0", digest = "sha256:8bfe2b27fbaa50a89fcf879b0a2dd549a3d9cf844001ff993a499a1abddcdcde" }
+version = "16.0.0"
+aube = { path = "locks/npm-textlint/16.0.0", digest = "sha256:5268ec78641654e2116420d747a9a46f6e1d7ed09bd99819ac2a44b1d609b95e" }
 backend = "npm:textlint"
-specifiers = ["15.8.0"]
+specifiers = ["16.0.0"]
 
 [[tools.pnpm]]
-version = "12.19.0"
+version = "12.21.0"
 backend = "aqua:pnpm/pnpm"
-specifiers = ["12.19.0"]
+specifiers = ["12.21.0"]
 
 [tools.pnpm."platforms.linux-x64"]
-checksum = "sha256:bf37edf4e26c3b31c1cac42c769ffabcb9231e9bc728762aeb1ee86bc711684a"
-url = "https://github.com/pnpm/pnpm/releases/download/v12.19.0/pnpm-linux-x64.tar.gz"
-url_api = "https://api.github.com/repos/pnpm/pnpm/releases/assets/729563509"
+checksum = "sha256:84c4773bcf4a217f4083cd7b2a91e4cee6103cf42426c1282ef37d308f55a410"
+url = "https://github.com/pnpm/pnpm/releases/download/v12.21.0/pnpm-linux-x64.tar.gz"
+url_api = "https://api.github.com/repos/pnpm/pnpm/releases/assets/744357264"
 provenance = "github-attestations"
 
 [tools.pnpm."platforms.macos-arm64"]
-checksum = "sha256:034aa9694d02e9345e56ffa2e6660b5c6ace2f27c99f6ea84db9bf50034315d6"
-url = "https://github.com/pnpm/pnpm/releases/download/v12.19.0/pnpm-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/pnpm/pnpm/releases/assets/729563507"
+checksum = "sha256:5c4d73018e00dd602531ce714625594fb693cbe110e6719df2b043b0ae62ab1a"
+url = "https://github.com/pnpm/pnpm/releases/download/v12.21.0/pnpm-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/pnpm/pnpm/releases/assets/744357270"
 provenance = "github-attestations"
