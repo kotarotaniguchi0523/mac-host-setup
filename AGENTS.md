@@ -124,6 +124,9 @@ macOS ホストへのソフトウェア導入・更新では、**サプライチ
 
 - **GitHub API は未認証だと 60 回/時で、mise の attestation 確認がすぐ止まる。** `tools/lib.sh` の `github_auth`（gh のトークンをそのプロセスにだけ渡す。保存しない）を使う。
 - **paranoid の mise は pnpm を拒否する。** npm バックエンドは `aube` を使い、依存グラフ `mise/locks/` も lock と一緒に commit する（ホスト専用ではない）。
+- **Renovate は `mise/locks/` を見ない（`ignorePaths`）。** npm マネージャが lock 内の `package.json` だけを書き換える PR を作り、
+  `mise.toml` と食い違ったまま自動マージされた（#14 / #15）。npm ツールの版は mise マネージャが `mise/mise.toml` で上げる。
+- CI で lock を commit するときは `git add` してから。`git commit -- <paths>` は未追跡のファイル（新しい版の `mise/locks/` ディレクトリ）を含めない。
 - github バックエンドで asset 名がプラットフォームごとに違うものは、プラットフォーム別の `asset_pattern` を書く（1 つのテンプレートだと別プラットフォームの lock に macOS の URL が入った）。
 
 ### APM（Skills）
@@ -134,6 +137,11 @@ macOS ホストへのソフトウェア導入・更新では、**サプライチ
 
 ### lint・CI
 
+- **bot の PR（flake-lock / mise-bin）と relock の push で起きた `pull_request` の run は承認待ち（`action_required`）になる。**
+  `GITHUB_TOKEN` で作成・更新した PR に GitHub が必ずかける仕様で、設定では外せない。承認しないと必須チェックが揃わず自動マージが止まる
+  （flake.lock の PR が 2 日放置された）。GitHub App のトークンで push すれば避けられるが、App の管理はしない方針。
+  PR を処理するときに `gh api 'repos/{owner}/{repo}/actions/runs?status=action_required'` で探し、
+  `gh api -X POST repos/{owner}/{repo}/actions/runs/<id>/approve` で手動承認する。
 - 公開されている鍵の指紋などが betterleaks に検出されたら、意味の分かる変数名にして `# gitleaks:allow` を付ける。
 - pii チェックは CI では `$USER`（CI の実行ユーザー名）も個人情報として探す。その名前と同じ英単語をコメントや文書に書くと CI だけで落ちる。
   push 前に `USER=<CI のユーザー名> tools/pii-check.sh <files>` で確かめる（CI のユーザー名は GitHub ホストランナーの既定値）。

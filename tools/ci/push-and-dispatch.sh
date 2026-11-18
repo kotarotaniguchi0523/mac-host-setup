@@ -8,6 +8,8 @@ shift 2
 git config user.name "github-actions[bot]"
 git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 git switch -C "$branch"
+# add first: `git commit -- <paths>` alone skips untracked files (new mise/locks/<tool>/<version> dirs)
+git add -A -- "$@"
 git commit -m "$message" -- "$@"
 git push --force origin "$branch"
 gh workflow run ci.yml --ref "$branch"
