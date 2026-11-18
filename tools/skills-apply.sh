@@ -44,4 +44,34 @@ if [[ -d skills/local ]]; then
     echo "[ok] ~/.claude/skills/$name (local)"
   done
 fi
+# Personal skills kept outside every repository (~/.apm-private/skills/<name>/SKILL.md) -> ~/.claude/skills/<name>
+# (Claude Code) and ~/.agents/skills/<name> (Codex, OpenCode and other agents that read the shared directory).
+# APM's user scope (~/.apm) is rebuilt from skills/ above and cannot hold them: a frozen install refuses skill
+# files it did not lock, and APM has no second user scope. They are copied here instead, outside the lock and
+# `apm audit`. Each copy carries a .private-skill marker: an unmarked directory is never overwritten, and a
+# marked copy whose source is gone is removed.
+private="$HOME/.apm-private/skills"
+for dest in "$HOME/.claude/skills" "$HOME/.agents/skills"; do
+  mkdir -p "$dest"
+  for d in "$dest"/*/; do
+    [[ -f "$d/.private-skill" ]] || continue
+    name="$(basename "$d")"
+    if [[ ! -f "$private/$name/SKILL.md" ]]; then
+      rm -rf "${dest:?}/${name:?}"
+      echo "[ok] removed $dest/$name (private skill, source gone)"
+    fi
+  done
+  [[ -d "$private" ]] || continue
+  for d in "$private"/*/; do
+    [[ -f "$d/SKILL.md" ]] || continue
+    name="$(basename "$d")"
+    if [[ -e "$dest/$name" && ! -f "$dest/$name/.private-skill" ]]; then
+      die "$dest/$name exists and is not a private skill; rename ~/.apm-private/skills/$name" 4
+    fi
+    rm -rf "${dest:?}/${name:?}"
+    cp -R "$d" "$dest/$name"
+    touch "$dest/$name/.private-skill"
+    echo "[ok] $dest/$name (private)"
+  done
+done
 echo "[ok] Skills deployed (apm.lock.yaml, audit clean)"
