@@ -2,6 +2,6 @@
   "name": "mise-npm-install",
   "private": true,
   "dependencies": {
-    "secretlint": "13.0.7"
+    "textlint": "16.0.0"
   }
 }
