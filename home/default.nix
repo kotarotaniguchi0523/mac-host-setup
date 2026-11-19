@@ -50,7 +50,17 @@
     # --- AI agents
     pi-coding-agent
     agent-browser
+    codex
+    # Antigravity CLI (`agy`, unfree: Google's tarball pinned by hash). T3 Code's Antigravity provider
+    # runs `agy acp` (>= 1.5.0) found on PATH when its Binary path is blank; T3's own managed runtime
+    # (self-updating, outside these declarations) is not installed (AUDIT.md).
+    antigravity-cli
   ];
+
+  # agy (antigravity-cli) updates itself in the background by default; its version is decided by
+  # flake.lock instead (AGENTS.md). Documented opt-out (antigravity.google/docs/cli/troubleshooting).
+  # GUI apps get the same variable from launchd (home/launchd.nix).
+  home.sessionVariables.AGY_CLI_DISABLE_AUTO_UPDATE = "true";
 
   programs.zsh = {
     enable = true;
