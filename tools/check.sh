@@ -9,8 +9,9 @@
 #   system   : the active nix-darwin generation was built from the current HEAD
 #   mise     : ~/.config/mise matches mise/ and every locked tool is installed
 #   skills   : ~/.apm matches skills/ and every file the APM lock deploys is present
-#   plugins  : every Claude Code plugin in claude-plugins/ is installed at its pinned commit and
-#              enabled, and no plugin from another marketplace is installed
+#   plugins  : every Claude Code plugin in claude-plugins/ is installed at its pinned commit,
+#              enabled and exported for sandboxes unchanged, and no plugin from another
+#              marketplace is installed
 #   strays   : global installs outside the declarations (~/.local/bin, npm -g, uv tool, nix profile,
 #              Homebrew)
 #   op       : /usr/local/bin/op (nix-darwin programs._1password) is signed by AgileBits
@@ -82,7 +83,16 @@ if [[ -f "$mkt_json" ]]; then
     elif [[ "$got" != "$sha" ]]; then add "plugins: $id is at ${got:0:12}, declared ${sha:0:12}"; fi
     [[ "$(jq -r --arg id "$id" '.enabledPlugins[$id] // false' "$settings" 2>/dev/null)" == "true" ]] ||
       add "plugins: $id is not enabled"
+    src="$(plugin_install_path "$id" "$installed")"
+    if [[ ! -d "$plugin_export_dir/$p" ]]; then add "plugins: $id is not exported for sandboxes (run tools/update.sh)"
+    elif [[ -d "$src" ]] && ! diff -rq "$src" "$plugin_export_dir/$p" >/dev/null 2>&1; then
+      add "plugins: sandbox export of $id differs from the installed copy (run tools/update.sh)"
+    fi
   done < <(jq -r '.plugins[] | [.name, .source.sha] | @tsv' "$mkt_json")
+  extra="$(for d in "$plugin_export_dir"/*; do
+    [[ -d "$d" ]] && ! jq -e --arg p "$(basename "$d")" 'any(.plugins[]; .name == $p)' "$mkt_json" >/dev/null && basename "$d"
+  done | paste -sd' ' -)"
+  [[ -n "$extra" ]] && add "plugins: undeclared plugins in the sandbox export: $extra"
   others="$(jq -r --arg m "$mkt_name" '.plugins // {} | keys[] | select(endswith("@" + $m) | not)' "$installed" 2>/dev/null | paste -sd' ' -)"
   [[ -n "$others" ]] && add "stray: Claude Code plugins outside claude-plugins/: $others"
 fi

@@ -34,6 +34,17 @@ github_auth() {
   export GITHUB_TOKEN="$token"
 }
 
+# The declared Claude Code plugins, copied out of Claude Code's version-keyed cache into one fixed
+# folder per plugin (tools/plugins-apply.sh writes it, tools/check.sh compares it). Sandboxes mount
+# this folder read-only and load it with CLAUDE_CODE_PLUGIN_DIRS, so they read the host's plugins
+# without installing their own copy. The path is fixed: sbx-setup's environment file points at it.
+# shellcheck disable=SC2034 # used by the scripts that source this file
+plugin_export_dir="$HOME/.local/share/mac-host-setup/claude-plugins"
+# The cached copy of <plugin>@<marketplace> installed for this user (empty when not installed).
+plugin_install_path() { # <id> <installed_plugins.json>
+  jq -r --arg id "$1" '.plugins[$id][]? | select(.scope == "user") | .installPath' "$2" 2>/dev/null | head -n 1
+}
+
 # mise for the global lane only (run from $HOME so this repository's mise.toml does not apply).
 mise_global() { (cd "$HOME" && mise "$@"); }
 
