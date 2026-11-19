@@ -104,6 +104,10 @@ Skill 以外（サブエージェント定義など）を含むプラグイン�
   （リポジトリを移動した後は同じ名前のまま新しい場所に付け替わる）→ `install` → `update`（宣言の commit へ移る）。
 - 点検: `tools/check.sh` が `~/.claude/plugins/installed_plugins.json` の `gitCommitSha` と宣言の `sha` を比べ、
   有効化（`enabledPlugins`）とマーケットプレイスの場所も確認する。別のマーケットプレイスから入れたプラグインは野良として出す。
+- sandbox（sbx）向けの書き出し: `plugins-apply.sh` が各プラグインの導入済みの中身を `~/.local/share/mac-host-setup/claude-plugins/<name>/`
+  に丸ごと置き換えてコピーする（Claude Code のキャッシュは版ごとのフォルダで、更新の直後は旧版も残るため、固定の場所に 1 版だけ置く）。
+  sbx-setup の環境ファイルがこのフォルダを読み取り専用でマウントし、`CLAUDE_CODE_PLUGIN_DIRS` で読ませる
+  （sandbox の中では何も導入しない。版はホストの宣言に従う）。`check.sh` は書き出しが導入済みの中身と一致するか、宣言に無いものが無いかを見る。
 - **`/plugin marketplace add cursor/plugins` / `/plugin install` を手で実行しない**（上流の `main` に追従し、版が宣言の外で決まる）。
   自動更新もオンにしない。版の更新は `marketplace.json` の `sha` を変える PR で行う（公開から 2 日以上経った commit）。
 - APM では入れられない: APM 0.35.0 は Agent Plugins 形式（`.claude-plugin/plugin.json`）のパッケージを `copilot` 以外の
