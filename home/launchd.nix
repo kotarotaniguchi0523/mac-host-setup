@@ -30,6 +30,8 @@ in
 {
   # Sets that PATH at every login (`launchctl setenv` alone does not survive a reboot).
   # Apps started after it inherit it; an app already running keeps its old PATH until restarted.
+  # Also turns off agy's background self-update for GUI apps (T3 Code runs `agy acp`); zsh gets
+  # the same variable from home.sessionVariables (home/default.nix). Versions come from flake.lock.
   launchd.agents.session-path = {
     enable = true;
     config = {
@@ -38,6 +40,8 @@ in
         "setenv"
         "PATH"
         sessionPath
+        "AGY_CLI_DISABLE_AUTO_UPDATE"
+        "true"
       ];
       RunAtLoad = true;
     };
