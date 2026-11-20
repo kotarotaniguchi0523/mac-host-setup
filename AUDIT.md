@@ -70,9 +70,9 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | ctx7 | 使わない（ユーザー判断、2026-11-12） |
 | skillspector | Skills レーンで別途判定（PLAN.md） |
 
-## Skills（`skills/apm.yml`、2026-11-12）
+## Skills（`skills/apm.yml`、2026-11-12。2026-11-20 更新）
 
-APM（Nix の `apm-cli`）で `~/.claude/skills/` へ配置する（ターゲットは `claude` のみ。codex / opencode は当面配置しない）。
+APM（Nix の `apm-cli`）で `claude`（`~/.claude/skills/`）・`codex`（`~/.agents/skills/`）・`antigravity`（`~/.gemini/antigravity-cli/skills/`）へ配置する（`home/default.nix` の `~/.gemini/config/skills.json` でも Antigravity のグローバル探索先に `~/.gemini/antigravity-cli/skills` を登録。opencode は当面配置しない）。
 依存はすべて commit SHA で固定し、`skills/apm.lock.yaml` が配置ファイルの sha256 まで記録する。
 
 - 適用: `tools/skills-apply.sh`（`tools/update.sh` から実行）。`apm install --global --frozen` → 配置漏れの確認 → `apm audit --ci`。
@@ -89,6 +89,7 @@ APM（Nix の `apm-cli`）で `~/.claude/skills/` へ配置する（ターゲッ
 | agent-browser | v0.41.2 | v0.42.0（11-10）・v0.43.0（11-12）。Renovate で更新 |
 | agent-desktop / agent-desktop-macos | v1.2.0 | v1.3.0（11-12、2 日未満） |
 | ax | v0.1.25 | 最新 |
+| artifactshare | cli-v0.23.0（98e5977、2026-11-09 公開） | 公開 11 日経過（2026-11-20）。`artifactshare/artifactshare` の `packages/cli/skills/artifactshare` |
 | yomiyasu | v2.5.0 | v3.0.0〜v3.1.0（major、11-10〜11-12）。Renovate で手動確認 |
 | nu_scripts（nushell） | main @ 1e6533e | main @ 7541123（11-12、2 日未満） |
 | explainer | main @ ccdd7ba | 変化なし |
