@@ -28,6 +28,7 @@
     builtins.elem (lib.getName pkg) [
       "docker-sbx" # Docker Sandboxes CLI (AUDIT.md)
       "1password-cli" # 1Password CLI (AUDIT.md)
+      "antigravity-cli" # Antigravity CLI `agy` for T3 Code (AUDIT.md)
     ];
 
   # --- System --------------------------------------------------------------------------

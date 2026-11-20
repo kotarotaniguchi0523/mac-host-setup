@@ -37,8 +37,8 @@
     betterleaks
     rtk
     ghq
-    # --- Skills (APM: skills/apm.yml -> ~/.claude/skills via tools/skills-apply.sh). Never run
-    #     `apm self-update` / `apm update`: versions change only through PRs (AUDIT.md).
+    # --- Skills (APM: skills/apm.yml -> ~/.claude/skills, ~/.agents/skills, ~/.gemini/antigravity-cli/skills
+    #     via tools/skills-apply.sh). Never run `apm self-update` / `apm update`: versions change only through PRs (AUDIT.md).
     apm-cli
     # --- Docker Sandboxes (sbx-setup builds and loads its templates from the host; the sandbox
     #     tools themselves live in the templates). Docker Desktop is an exception (exceptions.tsv).
@@ -50,7 +50,25 @@
     # --- AI agents
     pi-coding-agent
     agent-browser
+    codex
+    # Antigravity CLI (`agy`, unfree: Google's tarball pinned by hash). T3 Code's Antigravity provider
+    # runs `agy acp` (>= 1.5.0) found on PATH when its Binary path is blank; T3's own managed runtime
+    # (self-updating, outside these declarations) is not installed (AUDIT.md).
+    antigravity-cli
   ];
+
+  # agy (antigravity-cli) updates itself in the background by default; its version is decided by
+  # flake.lock instead (AGENTS.md). Documented opt-out (antigravity.google/docs/cli/troubleshooting).
+  # GUI apps get the same variable from launchd (home/launchd.nix).
+  home.sessionVariables.AGY_CLI_DISABLE_AUTO_UPDATE = "true";
+
+  # Point Antigravity's global discovery root (~/.gemini/config/) at the skills directory
+  # APM's `antigravity` target deploys to (~/.gemini/antigravity-cli/skills).
+  home.file.".gemini/config/skills.json".text = builtins.toJSON {
+    entries = [
+      { path = "~/.gemini/antigravity-cli/skills"; }
+    ];
+  };
 
   programs.zsh = {
     enable = true;

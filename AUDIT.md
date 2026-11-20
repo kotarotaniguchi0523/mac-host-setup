@@ -38,6 +38,8 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | lefthook | 2.2.2 | B | checksum, github_attestations（A） | **Nix**（A vs B） | sbx-setup の Git hooks（ホストで動く）。上流の最新と同じ版（2026-11-12） |
 | 1Password CLI（`_1password-cli`、nix-darwin `programs._1password`） | 2.41.1（flake.lock 更新で 2.42.0） | C（AgileBits 公式 pkg を固定 hash で取得、unfree。cache.nixos.org に無くローカルでビルド） | vfox / aqua とも `[none]`（E） | **Nix**（C vs E） | 2.42.0（2026-11-03 公開）で npm / pnpm の Shell Plugin が追加され、Takumi Guard のトークンに使う。2.42.0 の Security 項目は Linux コンテナイメージのみ。`/usr/local/bin/op` に置かれる（アプリ連携の要件、宣言による配置）。check.sh が Developer ID（Team `2BUA8C4S2C` = AgileBits）を確認（2026-11-12） |
 | sbx（`docker-sbx`） | 0.50.1 | C（Docker 公式の署名済み tarball を固定 hash で取得、unfree） | 登録なし | **Nix** | Docker Sandboxes の CLI（sbx-setup がホストで使う）。公式の推奨は Homebrew（禁止）。上流 0.53.0、新しい版の公開から 9 日（2026-11-12）。ビルド中の版確認だけ外している（`home/default.nix`）。check.sh が Sbx.app の Docker 署名（Team `9BNSXJN65R`）を確認 |
+| codex | 0.167.1 | B（fromSource、cache.nixos.org にあり） | aqua: checksum（C）。npm `@openai/codex`: `[none]`（E） | **Nix**（B vs C） | 2026-11-12 の「使わない」をユーザー判断で変更（2026-11-19）。上流の新しい版 0.167.2 の公開から 8 日（2026-11-19）。pnpm / `npm -g` は使わない（AGENTS.md）、npm 版は検証なし |
+| agy（`antigravity-cli`） | 1.5.6 | C（Google 公式 tarball を固定 hash で取得、unfree。cache.nixos.org に無くローカルでビルド） | aqua: `[none]`（E） | **Nix**（C vs E） | T3 Code の Antigravity プロバイダが `agy acp`（1.5.0 以降に内蔵）を PATH から使う。バイナリは Developer ID（Team `EQHXZ8M8AV` = Google LLC）署名・公証済みを確認（`codesign` / `spctl`、2026-11-19）。自動更新は `AGY_CLI_DISABLE_AUTO_UPDATE=true`（公式の opt-out）で止め、zsh と launchd（GUI アプリ）の両方に設定。`agy update` は使わない。上流の新しい版 1.5.7 の公開から 7 日（2026-11-19）。下記「入れないもの」も参照 |
 
 ## mise で入れるもの（`mise/mise.toml`）
 
@@ -60,15 +62,17 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | ツール | 理由 |
 |---|---|
 | herdr | 使わない（ユーザー判断、2026-11-11）。参考: nixpkgs に無く、mise も `[none]`（E） |
-| doppler / dotenvx / codex / opencode | 使わない（ユーザー判断、2026-11-12）。doppler / dotenvx は秘密情報を 1Password で扱うため |
+| doppler / dotenvx / opencode | 使わない（ユーザー判断、2026-11-12）。doppler / dotenvx は秘密情報を 1Password で扱うため（codex は 2026-11-19 に Nix で導入へ変更） |
+| antigravity-acp（nixpkgs 1.4.1） | 旧来の別配布の ACP サーバー（`dl.google.com` の zip。nixpkgs の `sourceProvenance` は未設定だが中身はバイナリ）。agy 1.5.0 以降は `agy acp` を内蔵し、T3 Code も 1.4.5 以前から agy へ移行させるため不要 |
+| T3 Code の Antigravity「managed runtime」 | T3 が agy を自分で取得・自己更新する（宣言の外）。T3 の設定で Install / Update Antigravity を押さず、Binary path は空のまま（PATH の Nix 版 `agy` が使われる） |
 | ghtkn | Windows の git credential helper。macOS は gh の期限付きトークン（`gh auth setup-git`）を使う |
 | openclaw | 使わない（ユーザー判断、2026-11-11）。参考: nixpkgs が insecure 指定（プロンプトインジェクション、既定でシステム全体にアクセス） |
 | ctx7 | 使わない（ユーザー判断、2026-11-12） |
 | skillspector | Skills レーンで別途判定（PLAN.md） |
 
-## Skills（`skills/apm.yml`、2026-11-12）
+## Skills（`skills/apm.yml`、2026-11-12。2026-11-20 更新）
 
-APM（Nix の `apm-cli`）で `~/.claude/skills/` へ配置する（ターゲットは `claude` のみ。codex / opencode は当面配置しない）。
+APM（Nix の `apm-cli`）で `claude`（`~/.claude/skills/`）・`codex`（`~/.agents/skills/`）・`antigravity`（`~/.gemini/antigravity-cli/skills/`）へ配置する（`home/default.nix` の `~/.gemini/config/skills.json` でも Antigravity のグローバル探索先に `~/.gemini/antigravity-cli/skills` を登録。opencode は当面配置しない）。
 依存はすべて commit SHA で固定し、`skills/apm.lock.yaml` が配置ファイルの sha256 まで記録する。
 
 - 適用: `tools/skills-apply.sh`（`tools/update.sh` から実行）。`apm install --global --frozen` → 配置漏れの確認 → `apm audit --ci`。
@@ -85,6 +89,7 @@ APM（Nix の `apm-cli`）で `~/.claude/skills/` へ配置する（ターゲッ
 | agent-browser | v0.41.2 | v0.42.0（11-10）・v0.43.0（11-12）。Renovate で更新 |
 | agent-desktop / agent-desktop-macos | v1.2.0 | v1.3.0（11-12、2 日未満） |
 | ax | v0.1.25 | 最新 |
+| artifactshare | cli-v0.23.0（98e5977、2026-11-09 公開） | 公開 11 日経過（2026-11-20）。`artifactshare/artifactshare` の `packages/cli/skills/artifactshare` |
 | yomiyasu | v2.5.0 | v3.0.0〜v3.1.0（major、11-10〜11-12）。Renovate で手動確認 |
 | nu_scripts（nushell） | main @ 1e6533e | main @ 7541123（11-12、2 日未満） |
 | explainer | main @ ccdd7ba | 変化なし |
@@ -100,6 +105,10 @@ Skill 以外（サブエージェント定義など）を含むプラグイン�
   （リポジトリを移動した後は同じ名前のまま新しい場所に付け替わる）→ `install` → `update`（宣言の commit へ移る）。
 - 点検: `tools/check.sh` が `~/.claude/plugins/installed_plugins.json` の `gitCommitSha` と宣言の `sha` を比べ、
   有効化（`enabledPlugins`）とマーケットプレイスの場所も確認する。別のマーケットプレイスから入れたプラグインは野良として出す。
+- sandbox（sbx）向けの書き出し: `plugins-apply.sh` が各プラグインの導入済みの中身を `~/.local/share/mac-host-setup/claude-plugins/<name>/`
+  に丸ごと置き換えてコピーする（Claude Code のキャッシュは版ごとのフォルダで、更新の直後は旧版も残るため、固定の場所に 1 版だけ置く）。
+  sbx-setup の環境ファイルがこのフォルダを読み取り専用でマウントし、`CLAUDE_CODE_PLUGIN_DIRS` で読ませる
+  （sandbox の中では何も導入しない。版はホストの宣言に従う）。`check.sh` は書き出しが導入済みの中身と一致するか、宣言に無いものが無いかを見る。
 - **`/plugin marketplace add cursor/plugins` / `/plugin install` を手で実行しない**（上流の `main` に追従し、版が宣言の外で決まる）。
   自動更新もオンにしない。版の更新は `marketplace.json` の `sha` を変える PR で行う（公開から 2 日以上経った commit）。
 - APM では入れられない: APM 0.35.0 は Agent Plugins 形式（`.claude-plugin/plugin.json`）のパッケージを `copilot` 以外の
