@@ -1,7 +1,8 @@
 #!/bin/bash
 # skills-apply.sh - deploy the Skills declared in skills/apm.yml (pinned by skills/apm.lock.yaml)
 # to this host: ~/.apm/ <- skills/, then `apm install --global --frozen` (targets in apm.yml:
-# claude -> ~/.claude/skills/). Called by tools/update.sh; also safe to run on its own.
+# claude -> ~/.claude/skills/, codex -> ~/.agents/skills/, antigravity -> ~/.gemini/antigravity-cli/skills/).
+# Called by tools/update.sh; also safe to run on its own.
 #
 # Never runs `apm update` / `apm lock` here: refs and the lock change only through PRs
 # (Renovate + skills-relock.yml). `apm update` also picks wrong targets for SHA pins (AUDIT.md).
@@ -33,15 +34,17 @@ if [[ -n "$(missing)" ]]; then
 fi
 apm_in "$HOME" "$apm" audit --ci >/dev/null || die "apm audit --ci failed (run it in ~/.apm for details)" 4
 
-# Skills written in this repository (skills/local/<name>/SKILL.md) -> ~/.claude/skills/<name>
+# Skills written in this repository (skills/local/<name>/SKILL.md) -> each target skills dir
 if [[ -d skills/local ]]; then
   for d in skills/local/*/; do
     [[ -f "$d/SKILL.md" ]] || continue
     name="$(basename "$d")"
-    rm -rf "$HOME/.claude/skills/$name"
-    mkdir -p "$HOME/.claude/skills"
-    cp -R "$d" "$HOME/.claude/skills/$name"
-    echo "[ok] ~/.claude/skills/$name (local)"
+    for dest in "$HOME/.claude/skills" "$HOME/.agents/skills" "$HOME/.gemini/antigravity-cli/skills"; do
+      rm -rf "${dest:?}/${name:?}"
+      mkdir -p "$dest"
+      cp -R "$d" "$dest/$name"
+      echo "[ok] ${dest/#$HOME/\~}/$name (local)"
+    done
   done
 fi
 echo "[ok] Skills deployed (apm.lock.yaml, audit clean)"
