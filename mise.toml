@@ -1,7 +1,7 @@
 # Dev tools scoped to this repository (separate from the global config mise/mise.toml).
 # Setup: mise trust . && mise install --locked && hk install
 [tools]
-hk          = "2.12.0"   # git hooks (hk.pkl)
+hk          = "2.13.0"   # git hooks (hk.pkl)
 betterleaks = "v1.10.1"   # secret scan (self-contained binary)
 shellcheck  = "0.11.0"  # tools/*.sh
 "github:jdx/jactionlint" = "v2.6.0"  # GitHub Actions lint
