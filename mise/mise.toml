@@ -25,7 +25,7 @@ pnpm                          = "12.23.0"
 "npm:secretlint"              = "14.1.0"
 # sbxray: Docker Sandboxes sbxenv.yaml analyzer. Not in nixpkgs. packslip verifies Sigstore OIDC
 # provenance (release.yml + repository ID) and sha256. macOS / Windows only (no linux-x64 asset).
-"packslip:github.com/kotarotaniguchi0523/sbxray" = "0.2.1"
+"packslip:github.com/kotarotaniguchi0523/sbxray" = { version = "0.2.1", os = ["macos"] }
 
 [settings]
 paranoid                 = true

@@ -146,7 +146,6 @@ specifiers = ["16.1.2"]
 version = "0.2.1"
 backend = "packslip:github.com/kotarotaniguchi0523/sbxray"
 specifiers = ["0.2.1"]
-unsupported_platforms = ["linux-x64"]
 
 [tools."packslip:github.com/kotarotaniguchi0523/sbxray"."platforms.macos-arm64"]
 checksum = "sha256:63d42b7823be9bc07266c3487d0414e6aed67551ec58042510de7e38b977e5e9"
