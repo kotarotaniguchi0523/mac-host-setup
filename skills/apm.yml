@@ -15,7 +15,7 @@ targets:
 dependencies:
   apm:
     # Browser automation / web fetching
-    - vercel-labs/agent-browser#1cc19526f3641c8543d55aa6700e7c55b37ac356 # v0.43.0
+    - vercel-labs/agent-browser#0a923358ea989d7602f0d06507ad3447c62ffe9b # v0.44.0
     # Desktop automation (agent-desktop). Same version as the CLI in mise/mise.toml. The CLI also
     # embeds these (`agent-desktop skills get`); declared here so the agent sees them as Skills.
     - vercel-labs/agent-desktop/skills/agent-desktop#b0b7277bea09b770ef9d1fb45aad667bc432cd57 # v1.3.1
@@ -24,7 +24,7 @@ dependencies:
     # Artifact Share CLI skill (sharing / previewing generated artifacts)
     - artifactshare/artifactshare/packages/cli/skills/artifactshare#98e59779b56ecfb84afbf565b4ebd143d886f3d3 # cli-v0.23.0
     # Japanese proofreading (rewrite AI-generated Japanese into natural Japanese)
-    - nanaism/yomiyasu#c49d5f1bee91258e33e1febc3569c6c87be7669e # v3.2.3
+    - nanaism/yomiyasu#fbd4e420fb71a6ba90f475898cf611ccb6a08cb2 # v3.4.0
     # Official Nushell skills (nushell org / nu_scripts)
     # No tags upstream, so this stays on a branch: APM updates it (`apm update`, or the
     # scheduled relock that re-resolves `main`). Renovate does not touch branch refs.
