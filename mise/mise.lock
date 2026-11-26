@@ -142,6 +142,17 @@ aube = { path = "locks/npm-textlint/16.1.2", digest = "sha256:1c0e48dd448f365483
 backend = "npm:textlint"
 specifiers = ["16.1.2"]
 
+[[tools."packslip:github.com/kotarotaniguchi0523/sbxray"]]
+version = "0.2.1"
+backend = "packslip:github.com/kotarotaniguchi0523/sbxray"
+specifiers = ["0.2.1"]
+
+[tools."packslip:github.com/kotarotaniguchi0523/sbxray"."platforms.macos-arm64"]
+checksum = "sha256:63d42b7823be9bc07266c3487d0414e6aed67551ec58042510de7e38b977e5e9"
+url = "https://github.com/kotarotaniguchi0523/sbxray/releases/download/v0.2.1/sbxray_0.2.1_darwin_arm64.tar.gz"
+signer = "sigstore-oidc:https://github.com/kotarotaniguchi0523/sbxray/.github/workflows/release.yml"
+repository_ids = { repository = "1465001786" }
+
 [[tools.pnpm]]
 version = "12.23.0"
 backend = "aqua:pnpm/pnpm"
