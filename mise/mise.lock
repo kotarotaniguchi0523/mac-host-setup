@@ -137,10 +137,10 @@ backend = "npm:t3"
 specifiers = ["0.1.11"]
 
 [[tools."npm:textlint"]]
-version = "16.1.2"
-aube = { path = "locks/npm-textlint/16.1.2", digest = "sha256:1c0e48dd448f36548319979a03d9d72343872a0822031ee5251e7c5ec58db5c0" }
+version = "16.1.3"
+aube = { path = "locks/npm-textlint/16.1.3", digest = "sha256:bdd30f082e53b0a05047582781bfb2fb99b8e4c2ecfe4cba69f979baea8c1b03" }
 backend = "npm:textlint"
-specifiers = ["16.1.2"]
+specifiers = ["16.1.3"]
 
 [[tools."packslip:github.com/kotarotaniguchi0523/sbxray"]]
 version = "0.2.1"
