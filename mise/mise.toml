@@ -23,6 +23,9 @@ pnpm                          = "12.23.0"
 # npm SLSA provenance; the postinstall links the bundled native binary, so allow only its build.
 "npm:agent-desktop"           = { version = "1.3.1", allow_builds = ["agent-desktop"] }
 "npm:secretlint"              = "14.1.0"
+# sbxray: Docker Sandboxes sbxenv.yaml analyzer. Not in nixpkgs. packslip verifies Sigstore OIDC
+# provenance (release.yml + repository ID) and sha256. macOS / Windows only (no linux-x64 asset).
+"packslip:github.com/kotarotaniguchi0523/sbxray" = "0.2.1"
 
 [settings]
 paranoid                 = true

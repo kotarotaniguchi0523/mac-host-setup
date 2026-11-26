@@ -56,6 +56,7 @@ nixpkgs の `meta.sourceProvenance` が未設定のパッケージは、nixpkgs 
 | `github:h4ckf0r0day/obscura` | nixpkgs は 0.2.2 のまま 53 日未追従。上流に checksums / attestation は無い（E）が、ユーザー承認（2026-11-12）。mise.lock の sha256 は GitHub のアセット digest と一致を確認（macos-arm64 / linux-x64） | lock のハッシュ固定のみ（E） |
 | `npm:secretlint` | nixpkgs に無い | npm（Takumi Guard 経由） |
 | `github:yusukebe/ax` | nixpkgs に無い。`ubi:` は検証なし（E）、`github:` は公開 `checksums.txt` で検証（C）。ユーザー承認（2026-11-11） | checksum（C） |
+| `packslip:github.com/kotarotaniguchi0523/sbxray` | nixpkgs に無い。macOS / Windows のみ（linux-x64 アセット無し）。v0.2.1 は公開 2 日未満だが、自リポジトリでありユーザー承認（2026-11-26） | packslip: Sigstore OIDC（`release.yml` + repository ID）+ sha256（A） |
 
 ## 入れないもの（報告）
 

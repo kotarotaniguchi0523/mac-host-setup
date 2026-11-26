@@ -19,9 +19,9 @@ trap 'rm -f "$patterns"' EXIT
 {
   [[ -n "${USER:-}" ]] && echo "$USER"
   git config --global user.email 2>/dev/null
-  command -v gh >/dev/null && gh config get -h github.com user 2>/dev/null
   [[ -f .agent/pii-patterns.txt ]] && grep -vE '^(#|$)' .agent/pii-patterns.txt
 } | grep -v '^$' > "$patterns"
+gh_user="$(command -v gh >/dev/null && gh config get -h github.com user 2>/dev/null || true)"
 
 if [[ $# -gt 0 ]]; then files=("$@"); else files=(); while IFS= read -r f; do files+=("$f"); done < <(git ls-files); fi
 
@@ -34,6 +34,11 @@ report() { # <message> <grep output>
 }
 not_self() { grep -v '^tools/pii-check.sh:' || true; }
 [[ -s "$patterns" ]] && report "found a personal value" "$(grep -nHIF -f "$patterns" -- "${files[@]}" 2>/dev/null | not_self)"
+if [[ -n "$gh_user" ]]; then
+  # Public self-owned tool dependencies (e.g. packslip:github.com/<user>/sbxray) are allowed.
+  report "found a personal value" \
+    "$(grep -nHIF -- "$gh_user" "${files[@]}" 2>/dev/null | not_self | grep -vF "github.com/${gh_user}/sbxray")"
+fi
 report "found a macOS home path" \
   "$(grep -nHIE -- '/Users/[A-Za-z0-9._-]+/' "${files[@]}" 2>/dev/null | not_self | grep -vE '/Users/(Shared|runner)/')"
 
